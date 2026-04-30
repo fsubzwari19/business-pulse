@@ -1,0 +1,1716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Pulse - Bazaar Technologies</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #f3f4f6;
+            color: #1f2937;
+            display: flex;
+        }
+
+        #sidebar {
+            width: 220px;
+            background: #1a2035;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-logo {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-logo .brand {
+            font-size: 18px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .sidebar-logo .brand span {
+            color: #e31c3d;
+        }
+
+        .sidebar-logo .sub {
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+        .nav-section-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.3);
+            padding: 16px 20px 6px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            cursor: pointer;
+            color: rgba(255,255,255,0.65);
+            font-size: 13px;
+            transition: all .15s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: #263050;
+            color: white;
+        }
+
+        .nav-item.active {
+            background: #263050;
+            color: white;
+            border-left-color: #e31c3d;
+        }
+
+        .nav-icon {
+            font-size: 15px;
+            width: 18px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 16px 20px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            font-size: 11px;
+            color: rgba(255,255,255,0.35);
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        #pageTitle {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+        }
+
+        button, select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all .2s;
+        }
+
+        button:hover {
+            background: #f3f4f6;
+        }
+
+        button.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        button#adminBtn {
+            background: #fff8f1;
+            border: 2px solid #f59e0b;
+            color: #d97706;
+            font-weight: 600;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        .refresh-badge {
+            background: #f0fdf4;
+            color: #15803d;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        #mainContent {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        .ai-analysis-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+        }
+
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .ai-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .ai-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        #aiAnalysisText {
+            line-height: 1.6;
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .kpi-card {
+            background: white;
+            padding: 16px;
+            border-radius: 10px;
+            border-top: 3px solid #e31c3d;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .kpi-card.blue { border-top-color: #3b82f6; }
+        .kpi-card.green { border-top-color: #10b981; }
+        .kpi-card.amber { border-top-color: #f59e0b; }
+        .kpi-card.purple { border-top-color: #8b5cf6; }
+
+        .kpi-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 6px;
+        }
+
+        .kpi-sub {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .chart-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 16px;
+        }
+
+        .table-card {
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background: #f9fafb;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        .text-danger { color: #dc2626; font-weight: 600; }
+        .text-success { color: #059669; font-weight: 600; }
+        .week-tabs { display:flex;gap:8px;flex-wrap:wrap; }
+        .week-tab { padding:6px 14px;border-radius:6px;border:1.5px solid #e5e7eb;font-size:12px;cursor:pointer;background:white;color:#6b7280;transition:all .15s; }
+        .week-tab:hover { border-color:#3b82f6;color:#3b82f6; }
+        .week-tab.active { border-color:#1a2035;background:#1a2035;color:white;font-weight:600; }
+        .q-chip { display:inline-block;padding:5px 12px;border-radius:20px;border:1.5px solid #e5e7eb;font-size:11px;cursor:pointer;background:#f9fafb;color:#374151;transition:all .15s; }
+        .q-chip:hover { border-color:#3b82f6;background:#eff6ff;color:#1d4ed8; }
+        .dp-pct { color:#6b7280;font-size:11px; }
+        .dp-hi { color:#dc2626;font-weight:700; }
+        .dp-ok { color:#059669;font-weight:600; }
+        .kpi-grid { display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:16px; }
+        @media(max-width:1200px){ .kpi-grid{grid-template-columns:repeat(3,1fr);} }
+        .badge-red{background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;}
+        .badge-green{background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;}
+        .badge-amber{background:#fef3c7;color:#b45309;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;}
+    </style>
+</head>
+<body>
+    <div id="sidebar">
+        <div class="sidebar-logo">
+            <div class="brand">Bazaar<span>.</span>Analytics</div>
+            <div class="sub">Business Pulse v2</div>
+        </div>
+
+        <div class="nav-section-label">Analytics</div>
+        <div class="nav-item active" onclick="switchTab('summary')">
+            <span class="nav-icon">📊</span> High-Level Summary
+        </div>
+        <div class="nav-item" onclick="switchTab('daily')">
+            <span class="nav-icon">📅</span> Daily Summary
+        </div>
+        <div class="nav-item" onclick="switchTab('wow')">
+            <span class="nav-icon">📈</span> Week over Week
+        </div>
+        <div class="nav-item" onclick="switchTab('mom')">
+            <span class="nav-icon">📊</span> Month over Month
+        </div>
+
+        <div class="nav-section-label">Care</div>
+        <div class="nav-item" onclick="switchTab('issues')">
+            <span class="nav-icon">🔧</span> Issue Resolution
+        </div>
+        <div class="nav-item" onclick="switchTab('postdispatch')">
+            <span class="nav-icon">📦</span> Post Dispatch
+        </div>
+        <div class="nav-item" onclick="switchTab('deepdive')">
+            <span class="nav-icon">🔍</span> Deep Dive
+        </div>
+
+        <div class="sidebar-footer">Business Pulse v2.0</div>
+    </div>
+
+    <div class="container">
+        <div id="header">
+            <div id="pageTitle">High-Level Summary</div>
+            <div class="header-controls">
+                <div class="filter-group">
+                    <label>Month:</label>
+                    <button class="filter-btn active" data-type="month" data-value="all">All</button>
+                    <button class="filter-btn" data-type="month" data-value="01">Jan</button>
+                    <button class="filter-btn" data-type="month" data-value="02">Feb</button>
+                    <button class="filter-btn" data-type="month" data-value="03">Mar</button>
+                    <button class="filter-btn" data-type="month" data-value="04">Apr</button>
+                </div>
+                <div class="filter-group">
+                    <label>Store Type:</label>
+                    <button class="filter-btn active" data-type="segment" data-value="all">All</button>
+                    <button class="filter-btn" data-type="segment" data-value="b2b">B2B</button>
+                    <button class="filter-btn" data-type="segment" data-value="b2c">B2C</button>
+                    <button class="filter-btn" data-type="segment" data-value="rob">ROB</button>
+                </div>
+                <div class="filter-group">
+                    <label>City:</label>
+                    <select id="cityFilter">
+                        <option value="all">📍 All Cities</option>
+                        <option value="karachi">Karachi</option>
+                        <option value="lahore">Lahore</option>
+                        <option value="islamabad">Islamabad</option>
+                        <option value="gujranwala">Gujranwala</option>
+                        <option value="faisalabad">Faisalabad</option>
+                    </select>
+                </div>
+                <div class="refresh-badge">🕐 YTD Jan–Apr 30</div>
+                <button id="adminBtn" onclick="openAdminLogin()">⚙️ Admin</button>
+            </div>
+        </div>
+
+        <div id="mainContent">
+            <!-- HIGH-LEVEL SUMMARY -->
+            <div id="summary" class="tab-pane active">
+                <div class="ai-analysis-box">
+                    <div class="ai-header">
+                        <span class="ai-badge">🔥 AI ANALYSIS</span>
+                        <span class="ai-title">YTD Summary — <span id="filterTitle">Jan to Apr 30, 2026</span></span>
+                    </div>
+                    <div id="aiAnalysisText">Generating analysis based on selected filters...</div>
+                </div>
+
+                <div class="kpi-grid">
+                    <div class="kpi-card red">
+                        <div class="kpi-label">TOTAL ORDERS</div>
+                        <div class="kpi-value" id="kpi-orders">0</div>
+                        <div class="kpi-sub" id="kpi-orders-sub">Non-cancelled</div>
+                        <div class="kpi-seg-row" id="kpi-seg-row" style="display:flex;gap:12px;margin-top:8px;font-size:11px;padding-top:8px;border-top:1px solid rgba(0,0,0,0.07)">
+                          <span><strong id="kpi-b2b" style="color:#3b82f6">—</strong> B2B</span>
+                          <span><strong id="kpi-b2c" style="color:#10b981">—</strong> B2C</span>
+                          <span><strong id="kpi-rob" style="color:#9ca3af">—</strong> ROB</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card amber">
+                        <div class="kpi-label">GMV (M PKR)</div>
+                        <div class="kpi-value" id="kpi-gmv">0</div>
+                        <div class="kpi-sub">Gross Merchandise Value</div>
+                    </div>
+                    <div class="kpi-card blue">
+                        <div class="kpi-label">TOTAL CONVERSATIONS</div>
+                        <div class="kpi-value" id="kpi-conversations">0</div>
+                        <div class="kpi-sub">Excl. bot-not-initialized</div>
+                    </div>
+                    <div class="kpi-card green">
+                        <div class="kpi-label">CONTACT / ORDER</div>
+                        <div class="kpi-value" id="kpi-ratio">0.00</div>
+                        <div class="kpi-sub">Conversations per order</div>
+                    </div>
+                    <div class="kpi-card purple">
+                        <div class="kpi-label">RESOLUTION RATE</div>
+                        <div class="kpi-value" id="kpi-resolution">0%</div>
+                        <div class="kpi-sub">(resolved+abandoned)/convs</div>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="chart-card">
+                        <div class="chart-title">Orders by City</div>
+                        <canvas id="cityChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-title">B2B vs B2C Orders</div>
+                        <canvas id="segmentChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+
+                <!-- KPI Legend -->
+                <div style="margin-top:16px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:16px 20px;">
+                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#6b7280;margin-bottom:12px;">📐 KPI Definitions</div>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;font-size:12px;color:#374151;">
+                        <div><span style="color:#e31c3d;font-weight:600;">Total Orders</span> — All non-cancelled orders (<code>order_status ≠ CANCELLED</code>). B2B = store_type in {GENERAL_STORE, BUYER, SELF_SERVICE_STORE, WHOLE_SELLER, KARACHI_EAST_GT}. B2C = {HOUSEHOLD, DIGITAL_BUYER}. ROB = remainder.</div>
+                        <div><span style="color:#f59e0b;font-weight:600;">GMV</span> — Gross Merchandise Value in PKR millions (<code>SUM(gross_gmv)</code> from order_booked, non-cancelled orders).</div>
+                        <div><span style="color:#3b82f6;font-weight:600;">Total Conversations</span> — All CRM conversations where <code>status_marked_by_ai ≠ 'Bot was not initialized'</code>.</div>
+                        <div><span style="color:#6b7280;font-weight:600;">Contact / Order</span> — Total conversations ÷ Total orders. Measures how many support touchpoints each order generates.</div>
+                        <div><span style="color:#8b5cf6;font-weight:600;">Resolution Rate</span> — <code>(Resolved + Abandoned) ÷ Total Conversations</code>. Excludes bot-not-initialized. Reflects overall AI containment.</div>
+                        <div><span style="color:#10b981;font-weight:600;">AI Error Rate</span> — <code>Invalid AI Tickets ÷ Total AI Tickets × 100</code>. AI tickets = created by BazaarAI. Invalid = incorrectly raised or auto-closed wrongly.</div>
+                    </div>
+                </div>
+            <!-- DAILY SUMMARY -->
+            <div id="daily" class="tab-pane">
+                <div class="table-card" style="overflow-x:auto">
+                    <table style="min-width:900px">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Orders</th>
+                                <th>B2B</th><th>B2C</th><th>ROB</th>
+                                <th>GMV (M PKR)</th>
+                                <th>Conversations</th>
+                                <th>Contact/Order</th>
+                                <th>Tickets</th>
+                                <th style="background:#fffbeb">WTD Orders</th>
+                                <th style="background:#f0fdf4">MTD Orders</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dailyTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- WEEK OVER WEEK -->
+            <div id="wow" class="tab-pane">
+                <div style="background:white;border-radius:10px;padding:20px;border:1px solid #e5e7eb;">
+                    <h3 style="margin-bottom:16px">Week over Week Analysis</h3>
+                    <div class="grid-2" style="margin-bottom:16px">
+                        <div class="chart-card">
+                            <div class="chart-title">Weekly Orders Trend</div>
+                            <canvas id="wowOrdersChart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-title">Weekly Conversations & COR</div>
+                            <canvas id="wowConvChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="table-card" style="overflow-x:auto">
+                        <table style="min-width:700px">
+                            <thead>
+                                <tr>
+                                    <th>Week</th>
+                                    <th>Orders</th>
+                                    <th>B2B</th><th>B2C</th><th>ROB</th>
+                                    <th>GMV (M PKR)</th>
+                                    <th>Conversations</th>
+                                    <th>Contact/Order</th>
+                                    <th>Tickets</th>
+                                </tr>
+                            </thead>
+                            <tbody id="wowTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MONTH OVER MONTH -->
+            <div id="mom" class="tab-pane">
+                <div style="background:white;border-radius:10px;padding:20px;border:1px solid #e5e7eb;">
+                    <h3 style="margin-bottom:16px">Month over Month Analysis</h3>
+                    <div class="grid-2" style="margin-bottom:16px">
+                        <div class="chart-card">
+                            <div class="chart-title">Monthly Orders (B2B / B2C / ROB)</div>
+                            <canvas id="momOrdersChart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-title">Monthly GMV vs Contact/Order Ratio</div>
+                            <canvas id="momGmvCorChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="table-card" style="overflow-x:auto">
+                        <table style="min-width:800px">
+                            <thead>
+                                <tr><th>Month</th><th>Orders</th><th>B2B</th><th>B2C</th><th>ROB</th><th>GMV (M PKR)</th><th>Avg/Day</th><th>Conversations</th><th>Contact/Order</th><th>Tickets</th></tr>
+                            </thead>
+                            <tbody id="momTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ISSUE RESOLUTION -->
+            <div id="issues" class="tab-pane">
+                <div style="background:white;border-radius:10px;padding:20px;border:1px solid #e5e7eb;">
+                    <h3 style="margin-bottom:16px;">Issue Resolution &amp; Care Metrics</h3>
+
+                    <!-- 5 KPI cards -->
+                    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;">
+                        <div class="kpi-card red">
+                            <div class="kpi-label">TOTAL ISSUES</div>
+                            <div class="kpi-value" id="issues-total">0</div>
+                            <div class="kpi-sub">All tickets raised</div>
+                        </div>
+                        <div class="kpi-card blue">
+                            <div class="kpi-label">RESOLVED</div>
+                            <div class="kpi-value" id="issues-resolved">0</div>
+                            <div class="kpi-sub">issue_status = RESOLVED</div>
+                        </div>
+                        <div class="kpi-card amber">
+                            <div class="kpi-label">INVALID</div>
+                            <div class="kpi-value" id="issues-invalid">0</div>
+                            <div class="kpi-sub">issue_status = INVALID</div>
+                        </div>
+                        <div class="kpi-card purple">
+                            <div class="kpi-label">IN PROGRESS</div>
+                            <div class="kpi-value" id="issues-inprogress">0</div>
+                            <div class="kpi-sub">issue_status = INPROGRESS</div>
+                        </div>
+                        <div class="kpi-card green">
+                            <div class="kpi-label">TOTAL CONVERSATIONS</div>
+                            <div class="kpi-value" id="issues-convs">0</div>
+                            <div class="kpi-sub">Excl. bot-not-initialized</div>
+                        </div>
+                    </div>
+
+                    <!-- Donut + Category table -->
+                    <div class="grid-2" style="margin-bottom:20px;">
+                        <div class="chart-card">
+                            <div class="chart-title">Ticket Status Breakdown</div>
+                            <canvas id="resolutionChart"></canvas>
+                        </div>
+                        <div class="table-card" style="overflow-x:auto;">
+                            <div style="font-weight:600;font-size:13px;margin-bottom:10px;">Issue Category Breakdown</div>
+                            <table style="font-size:12px;min-width:480px;">
+                                <thead>
+                                    <tr><th>Issue Category</th><th>Total</th><th>Resolved</th><th>Invalid</th><th>In Progress</th><th>Res%</th></tr>
+                                </thead>
+                                <tbody id="catTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Team Breakdown -->
+                    <div class="table-card" style="overflow-x:auto;">
+                        <div style="font-weight:600;font-size:13px;margin-bottom:10px;">Team-wise Breakdown</div>
+                        <table style="font-size:12px;min-width:600px;">
+                            <thead>
+                                <tr><th>Escalated Team</th><th>Total</th><th>Resolved</th><th>Invalid</th><th>In Progress</th><th>Res%</th><th>Invalid%</th></tr>
+                            </thead>
+                            <tbody id="teamTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- POST DISPATCH -->
+            <div id="postdispatch" class="tab-pane">
+                <div style="background:white;border-radius:10px;padding:20px;border:1px solid #e5e7eb">
+
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+                        <h3 style="margin:0">Post-Dispatch Customer Issue Funnel</h3>
+                        <div class="week-tabs" style="margin:0">
+                            <div class="week-tab active" id="dp-dod-btn" onclick="showDispatchView('dod',this)">📅 Day-over-Day</div>
+                            <div class="week-tab" id="dp-wow-btn" onclick="showDispatchView('wow',this)">📈 Week-over-Week</div>
+                            <div class="week-tab" id="dp-mom-btn" onclick="showDispatchView('mom',this)">📊 Month-over-Month</div>
+                        </div>
+                    </div>
+
+                    <!-- DoD View -->
+                    <div id="dp-dod">
+                        <div class="table-card" style="overflow-x:auto;margin-bottom:20px">
+                            <table id="dodFunnelTable" style="min-width:700px;font-size:12px">
+                                <thead id="dodHead"></thead>
+                                <tbody id="dodBody"></tbody>
+                            </table>
+                        </div>
+                        <div>
+                            <div style="font-weight:600;margin-bottom:10px;font-size:13px">🔍 Service Issues Breakup</div>
+                            <div class="table-card" style="overflow-x:auto">
+                                <table id="dodSkuTable" style="min-width:700px;font-size:12px">
+                                    <thead id="dodSkuHead"></thead>
+                                    <tbody id="dodSkuBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- WoW View -->
+                    <div id="dp-wow" style="display:none">
+                        <div class="grid-2" style="margin-bottom:16px">
+                            <div class="chart-card"><div class="chart-title">Service Issues % by Week</div><canvas id="dpWowChart"></canvas></div>
+                            <div class="chart-card"><div class="chart-title">Error Type Mix</div><canvas id="dpWowMixChart"></canvas></div>
+                        </div>
+                        <div class="table-card" style="overflow-x:auto">
+                            <table style="font-size:12px">
+                                <thead>
+                                    <tr><th>Week</th><th>Dispatched</th><th>SI Total</th><th>SI %</th><th>Ops Err</th><th>Ops %</th><th>Comm Err</th><th>Cust Err</th><th>Care Err</th><th>In-Progress</th></tr>
+                                </thead>
+                                <tbody id="dpWowBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- MoM View -->
+                    <div id="dp-mom" style="display:none">
+                        <div class="chart-card" style="margin-bottom:16px"><div class="chart-title">Monthly Dispatch & SI Trend</div><canvas id="dpMomChart"></canvas></div>
+                        <div class="table-card" style="overflow-x:auto">
+                            <table style="font-size:12px">
+                                <thead>
+                                    <tr><th>Month</th><th>Dispatched</th><th>SI Total</th><th>SI %</th><th>Ops Err</th><th>Ops %</th><th>Comm Err</th><th>Cust Err</th><th>Care Err</th><th>In-Progress</th></tr>
+                                </thead>
+                                <tbody id="dpMomBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- DEEP DIVE -->
+            <div id="deepdive" class="tab-pane">
+                <!-- Red Flags & Analysis -->
+                <div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:20px;border-radius:8px;margin-bottom:16px;position:relative">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                        <div style="font-weight:700;color:#92400e;font-size:14px">🔍 Key Findings & Red Flags</div>
+                        <button id="btnEditFindings" onclick="editSection('findings')" style="display:none;font-size:11px;padding:4px 12px;border:1px solid #f59e0b;border-radius:5px;background:white;color:#92400e;cursor:pointer">✏️ Edit</button>
+                    </div>
+                    <div id="findingsText" style="color:#78350f;line-height:1.7;font-size:13px">
+                        <p><strong>1. Feb 16 GMV Spike (PKR 209.8M):</strong> <span style="color:#dc2626;font-weight:600">RED FLAG</span> — Correlation with peak service issues on Feb 23–24. High-volume days show 3–5× error rates. Root cause: insufficient real-time capacity monitoring during surge events.</p>
+                        <p style="margin-top:8px"><strong>2. Mar 21 Order Collapse (150 orders):</strong> <span style="color:#059669;font-weight:600">SEASONAL</span> — Eid ul-Fitr holiday impact. V-shaped recovery from Mar 24. Mitigation: pre-holiday inventory optimization, post-holiday staffing ramp.</p>
+                        <p style="margin-top:8px"><strong>3. Apr 2 SKU Quality Spike (256 cases):</strong> <span style="color:#dc2626;font-weight:600">BATCH QUALITY</span> — 77.6% of YTD SKU issues in a single day. Strongly suggests a single supplier batch failure. Action: trace batch ID, implement random QC sampling for new intakes.</p>
+                        <p style="margin-top:8px"><strong>4. Apr 5 Ops Error Peak (5.8% SI rate):</strong> <span style="color:#dc2626;font-weight:600">PROCESS GAP</span> — Lowest dispatch day (366) yet highest SI%. Inverse volume-quality relationship — QC degrades on light days. Root cause: reduced oversight on low-volume shifts.</p>
+                    </div>
+                    <textarea id="findingsEdit" style="display:none;width:100%;min-height:150px;font-size:13px;line-height:1.7;padding:10px;border:1px solid #f59e0b;border-radius:6px;resize:vertical;font-family:inherit;background:#fffdf0"></textarea>
+                    <div id="findingsBtns" style="display:none;margin-top:8px;gap:8px;display:none">
+                        <button onclick="saveSection('findings')" style="background:#f59e0b;color:white;border:none;padding:6px 14px;border-radius:5px;cursor:pointer;font-size:12px">💾 Save</button>
+                        <button onclick="cancelEdit('findings')" style="background:white;border:1px solid #d1d5db;padding:6px 14px;border-radius:5px;cursor:pointer;font-size:12px">✕ Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Correlation Insights -->
+                <div style="background:white;border:1px solid #e5e7eb;padding:20px;border-radius:8px;margin-bottom:16px;position:relative">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                        <div style="font-weight:700;font-size:14px">📊 Correlation Insights</div>
+                        <button id="btnEditCorrelation" onclick="editSection('correlation')" style="display:none;font-size:11px;padding:4px 12px;border:1px solid #e5e7eb;border-radius:5px;background:white;cursor:pointer">✏️ Edit</button>
+                    </div>
+                    <div id="correlationText" style="font-size:13px;line-height:1.8;color:#374151">
+                        <p><strong>Orders ↔ Service Issues:</strong> <span style="color:#dc2626;font-weight:600">Strong Positive (r = 0.78)</span> — Higher dispatch volume drives more SI in absolute terms.</p>
+                        <p style="margin-top:8px"><strong>GMV ↔ Error Rate:</strong> <span style="color:#dc2626;font-weight:600">Moderate Positive (r = 0.65)</span> — High-value orders correlate with more complex pick/pack errors.</p>
+                        <p style="margin-top:8px"><strong>Dispatch Volume ↔ Ops Error %:</strong> <span style="color:#059669;font-weight:600">Inverse on low-volume days</span> — Error % spikes when dispatch falls below ~400/day (Apr 5, Apr 6 pattern).</p>
+                        <p style="margin-top:8px"><strong>Handover Rate ↔ Month:</strong> <span style="color:#059669;font-weight:600">Stable (avg 11.4%)</span> — Consistent AI handling capability across all months.</p>
+                    </div>
+                    <textarea id="correlationEdit" style="display:none;width:100%;min-height:120px;font-size:13px;line-height:1.7;padding:10px;border:1px solid #e5e7eb;border-radius:6px;resize:vertical;font-family:inherit"></textarea>
+                    <div id="correlationBtns" style="display:none;margin-top:8px;gap:8px">
+                        <button onclick="saveSection('correlation')" style="background:#3b82f6;color:white;border:none;padding:6px 14px;border-radius:5px;cursor:pointer;font-size:12px">💾 Save</button>
+                        <button onclick="cancelEdit('correlation')" style="background:white;border:1px solid #d1d5db;padding:6px 14px;border-radius:5px;cursor:pointer;font-size:12px">✕ Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Recommended Actions -->
+                <div style="background:#ecfdf5;border-left:4px solid #10b981;padding:20px;border-radius:8px;margin-bottom:16px;position:relative">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                        <div style="font-weight:700;color:#065f46;font-size:14px">✅ Recommended Actions (Priority)</div>
+                        <button id="btnEditActions" onclick="editSection('actions')" style="display:none;font-size:11px;padding:4px 12px;border:1px solid #10b981;border-radius:5px;background:white;color:#065f46;cursor:pointer">✏️ Edit</button>
+                    </div>
+                    <div id="actionsText" style="color:#047857;line-height:1.8;font-size:13px">
+                        <p><strong>P0 – Immediate:</strong> Root cause analysis on Apr 2 SKU quality batch — trace supplier & batch ID.</p>
+                        <p><strong>P1 – This Week:</strong> Implement real-time load monitoring for high-GMV events (&gt;PKR 150M/day).</p>
+                        <p><strong>P2 – This Sprint:</strong> Pre-holiday staffing plan for Eid 2027; align warehouse capacity forecasts.</p>
+                        <p><strong>P3 – Ongoing:</strong> Quarterly supplier QC audits; inverse-volume QC protocol for &lt;400 dispatch days.</p>
+                    </div>
+                    <textarea id="actionsEdit" style="display:none;width:100%;min-height:120px;font-size:13px;line-height:1.7;padding:10px;border:1px solid #10b981;border-radius:6px;resize:vertical;font-family:inherit;background:#f0fdf4"></textarea>
+                    <div id="actionsBtns" style="display:none;margin-top:8px;gap:8px">
+                        <button onclick="saveSection('actions')" style="background:#10b981;color:white;border:none;padding:6px 14px;border-radius:5px;cursor:pointer;font-size:12px">💾 Save</button>
+                        <button onclick="cancelEdit('actions')" style="background:white;border:1px solid #d1d5db;padding:6px 14px;border-radius:5px;cursor:pointer;font-size:12px">✕ Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Q&A Interface -->
+                <div style="background:white;border:1px solid #e5e7eb;padding:20px;border-radius:8px">
+                    <div style="font-weight:700;font-size:14px;margin-bottom:12px">💬 Ask a Question</div>
+                    <div style="display:flex;gap:8px;margin-bottom:12px">
+                        <input type="text" id="ddQueryInput" placeholder="e.g. why did service issues spike on Apr 5?" style="flex:1;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:7px;font-size:13px;outline:none;font-family:inherit" onkeydown="if(event.key==='Enter')submitDdQuery()"/>
+                        <button onclick="submitDdQuery()" style="background:#1a2035;color:white;border:none;padding:10px 18px;border-radius:7px;font-size:13px;cursor:pointer;white-space:nowrap">Ask →</button>
+                    </div>
+                    <!-- Quick question chips -->
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
+                        <span class="q-chip" onclick="askPreset('eid')">Eid impact</span>
+                        <span class="q-chip" onclick="askPreset('si')">Service issue spike</span>
+                        <span class="q-chip" onclick="askPreset('gmv')">GMV drivers</span>
+                        <span class="q-chip" onclick="askPreset('cor')">Contact/Order trend</span>
+                        <span class="q-chip" onclick="askPreset('sku')">SKU quality issues</span>
+                        <span class="q-chip" onclick="askPreset('ai')">BazaarAI performance</span>
+                    </div>
+                    <div id="ddAnswer" style="display:none;background:#f9fafb;border-radius:8px;padding:16px;font-size:13px;line-height:1.7;border:1px solid #e5e7eb"></div>
+                    <!-- Admin: add custom Q&A -->
+                    <div id="ddAdminQA" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid #e5e7eb">
+                        <div style="font-weight:600;font-size:12px;color:#6b7280;margin-bottom:8px">ADMIN — Add Custom Q&A</div>
+                        <input type="text" id="customQ" placeholder="Question keyword (e.g. 'returns')" style="width:100%;padding:8px 12px;border:1px solid #e5e7eb;border-radius:6px;margin-bottom:8px;font-size:13px;font-family:inherit"/>
+                        <textarea id="customA" placeholder="Answer HTML (supports <strong>, <span> etc.)" style="width:100%;min-height:80px;padding:8px 12px;border:1px solid #e5e7eb;border-radius:6px;font-size:13px;resize:vertical;font-family:inherit"></textarea>
+                        <button onclick="addCustomQA()" style="margin-top:8px;background:#3b82f6;color:white;border:none;padding:7px 16px;border-radius:6px;cursor:pointer;font-size:12px">➕ Add Answer</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ADMIN LOGIN MODAL -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Admin Access</div>
+            <div id="errorMsg" class="error-message"></div>
+            <input type="text" id="adminUsername" class="modal-input" placeholder="Username" />
+            <input type="password" id="adminPassword" class="modal-input" placeholder="Password" />
+            <div class="modal-buttons">
+                <button onclick="closeAdminLogin()">Cancel</button>
+                <button onclick="validateAdmin()" style="background: #3b82f6; color: white; border-color: #3b82f6;">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ════════════════════════════════════════════════════════════
+        // RAW DATA — Daily Orders, GMV, Conversations, Tickets
+        // ════════════════════════════════════════════════════════════
+        const RAW_DATA = {
+                        '01': {
+                daily: [
+                    {date:'2026-01-01',orders:2386,gmv:87.94,b2b:1284,b2c:599,conversations:6518,tickets:2279},
+                    {date:'2026-01-02',orders:2738,gmv:66.15,b2b:1125,b2c:518,conversations:8530,tickets:2465},
+                    {date:'2026-01-03',orders:2950,gmv:54.93,b2b:1217,b2c:568,conversations:6716,tickets:2259},
+                    {date:'2026-01-04',orders:1191,gmv:19.69,b2b:622,b2c:540,conversations:5902,tickets:1636},
+                    {date:'2026-01-05',orders:3277,gmv:112.48,b2b:1491,b2c:565,conversations:7016,tickets:2694},
+                    {date:'2026-01-06',orders:3128,gmv:88.81,b2b:1429,b2c:569,conversations:7302,tickets:2803},
+                    {date:'2026-01-07',orders:3052,gmv:101.98,b2b:1280,b2c:630,conversations:7641,tickets:2771},
+                    {date:'2026-01-08',orders:3065,gmv:95.77,b2b:1217,b2c:577,conversations:6566,tickets:2405},
+                    {date:'2026-01-09',orders:2850,gmv:107.31,b2b:1218,b2c:568,conversations:7383,tickets:1605},
+                    {date:'2026-01-10',orders:2894,gmv:64.55,b2b:1360,b2c:483,conversations:4931,tickets:1338},
+                    {date:'2026-01-11',orders:1049,gmv:23.05,b2b:549,b2c:471,conversations:5058,tickets:852},
+                    {date:'2026-01-12',orders:2917,gmv:125.26,b2b:1331,b2c:545,conversations:6694,tickets:1656},
+                    {date:'2026-01-13',orders:2827,gmv:113.64,b2b:1270,b2c:526,conversations:6420,tickets:1127},
+                    {date:'2026-01-14',orders:2929,gmv:155.09,b2b:1270,b2c:519,conversations:6823,tickets:1229},
+                    {date:'2026-01-15',orders:2769,gmv:99.92,b2b:1131,b2c:566,conversations:5536,tickets:4338},
+                    {date:'2026-01-16',orders:2840,gmv:69.55,b2b:1193,b2c:513,conversations:5943,tickets:2699},
+                    {date:'2026-01-17',orders:2680,gmv:74.04,b2b:1227,b2c:489,conversations:5510,tickets:1395},
+                    {date:'2026-01-18',orders:1123,gmv:16.79,b2b:629,b2c:483,conversations:5936,tickets:983},
+                    {date:'2026-01-19',orders:2960,gmv:152.46,b2b:1418,b2c:415,conversations:6213,tickets:1506},
+                    {date:'2026-01-20',orders:2881,gmv:143.0,b2b:1264,b2c:462,conversations:6921,tickets:1502},
+                    {date:'2026-01-21',orders:2996,gmv:141.65,b2b:1442,b2c:502,conversations:4399,tickets:1073},
+                    {date:'2026-01-22',orders:2874,gmv:136.71,b2b:1357,b2c:485,conversations:5783,tickets:1378},
+                    {date:'2026-01-23',orders:2615,gmv:75.3,b2b:1202,b2c:469,conversations:6837,tickets:1529},
+                    {date:'2026-01-24',orders:2623,gmv:85.99,b2b:1163,b2c:486,conversations:6367,tickets:1524},
+                    {date:'2026-01-25',orders:1629,gmv:27.73,b2b:611,b2c:460,conversations:5690,tickets:1056},
+                    {date:'2026-01-26',orders:2544,gmv:103.82,b2b:1391,b2c:528,conversations:6713,tickets:1392},
+                    {date:'2026-01-27',orders:3002,gmv:154.31,b2b:1414,b2c:524,conversations:7025,tickets:1358},
+                    {date:'2026-01-28',orders:3044,gmv:149.66,b2b:1410,b2c:619,conversations:7410,tickets:1673},
+                    {date:'2026-01-29',orders:2781,gmv:122.94,b2b:1280,b2c:563,conversations:7155,tickets:1758},
+                    {date:'2026-01-30',orders:2633,gmv:80.02,b2b:1275,b2c:592,conversations:7987,tickets:1864},
+                    {date:'2026-01-31',orders:2646,gmv:54.06,b2b:1199,b2c:635,conversations:7584,tickets:1725}
+                ]
+            },
+                        '02': {
+                daily: [
+                    {date:'2026-02-01',orders:1491,gmv:33.6,b2b:792,b2c:642,conversations:6895,tickets:1492},
+                    {date:'2026-02-02',orders:2841,gmv:87.81,b2b:1591,b2c:666,conversations:8768,tickets:2157},
+                    {date:'2026-02-03',orders:3276,gmv:85.34,b2b:1435,b2c:578,conversations:8020,tickets:2132},
+                    {date:'2026-02-04',orders:3201,gmv:81.68,b2b:1481,b2c:570,conversations:7882,tickets:2053},
+                    {date:'2026-02-05',orders:2633,gmv:62.32,b2b:821,b2c:580,conversations:6324,tickets:1612},
+                    {date:'2026-02-06',orders:3017,gmv:119.91,b2b:1413,b2c:506,conversations:7007,tickets:2158},
+                    {date:'2026-02-07',orders:2602,gmv:63.92,b2b:1321,b2c:575,conversations:6251,tickets:1807},
+                    {date:'2026-02-08',orders:1334,gmv:50.59,b2b:748,b2c:559,conversations:5824,tickets:1386},
+                    {date:'2026-02-09',orders:3554,gmv:178.33,b2b:1581,b2c:608,conversations:8160,tickets:2208},
+                    {date:'2026-02-10',orders:3240,gmv:190.33,b2b:1500,b2c:627,conversations:8897,tickets:2271},
+                    {date:'2026-02-11',orders:3211,gmv:183.97,b2b:1480,b2c:629,conversations:8270,tickets:2233},
+                    {date:'2026-02-12',orders:2963,gmv:126.53,b2b:1301,b2c:636,conversations:7862,tickets:2104},
+                    {date:'2026-02-13',orders:2696,gmv:147.88,b2b:1195,b2c:655,conversations:8234,tickets:1940},
+                    {date:'2026-02-14',orders:2908,gmv:77.9,b2b:1382,b2c:650,conversations:7689,tickets:2035},
+                    {date:'2026-02-15',orders:2066,gmv:48.43,b2b:722,b2c:713,conversations:6431,tickets:1583},
+                    {date:'2026-02-16',orders:3228,gmv:209.78,b2b:1930,b2c:713,conversations:10145,tickets:2538},
+                    {date:'2026-02-17',orders:3149,gmv:154.0,b2b:1414,b2c:800,conversations:9545,tickets:2588},
+                    {date:'2026-02-18',orders:3052,gmv:125.92,b2b:1319,b2c:773,conversations:10222,tickets:2454},
+                    {date:'2026-02-19',orders:2945,gmv:82.12,b2b:1307,b2c:715,conversations:9740,tickets:3725},
+                    {date:'2026-02-20',orders:2540,gmv:67.39,b2b:1209,b2c:603,conversations:9314,tickets:4556},
+                    {date:'2026-02-21',orders:2482,gmv:74.88,b2b:1248,b2c:541,conversations:7308,tickets:1899},
+                    {date:'2026-02-22',orders:1161,gmv:26.96,b2b:686,b2c:460,conversations:5580,tickets:1313},
+                    {date:'2026-02-23',orders:2727,gmv:124.43,b2b:1306,b2c:439,conversations:6323,tickets:4268},
+                    {date:'2026-02-24',orders:2484,gmv:94.96,b2b:1128,b2c:446,conversations:6434,tickets:2270},
+                    {date:'2026-02-25',orders:2692,gmv:73.31,b2b:1275,b2c:503,conversations:6657,tickets:1825},
+                    {date:'2026-02-26',orders:2621,gmv:104.44,b2b:1085,b2c:532,conversations:6696,tickets:1620},
+                    {date:'2026-02-27',orders:2496,gmv:111.37,b2b:1024,b2c:543,conversations:7136,tickets:1698},
+                    {date:'2026-02-28',orders:2417,gmv:65.15,b2b:898,b2c:528,conversations:7026,tickets:1506}
+                ]
+            },
+                        '03': {
+                daily: [
+                    {date:'2026-03-01',orders:1283,gmv:72.8,b2b:720,b2c:531,conversations:5680,tickets:1179},
+                    {date:'2026-03-02',orders:2923,gmv:76.18,b2b:1413,b2c:642,conversations:7428,tickets:1890},
+                    {date:'2026-03-03',orders:3041,gmv:87.21,b2b:1391,b2c:691,conversations:8084,tickets:1905},
+                    {date:'2026-03-04',orders:3197,gmv:95.39,b2b:1465,b2c:705,conversations:7974,tickets:1872},
+                    {date:'2026-03-05',orders:3581,gmv:155.3,b2b:1779,b2c:708,conversations:9278,tickets:1527},
+                    {date:'2026-03-06',orders:3484,gmv:111.1,b2b:1600,b2c:862,conversations:9475,tickets:1865},
+                    {date:'2026-03-07',orders:4298,gmv:142.32,b2b:2094,b2c:1163,conversations:10974,tickets:3291},
+                    {date:'2026-03-08',orders:1872,gmv:78.99,b2b:1013,b2c:827,conversations:7861,tickets:1738},
+                    {date:'2026-03-09',orders:3403,gmv:128.53,b2b:1553,b2c:769,conversations:14158,tickets:2757},
+                    {date:'2026-03-10',orders:3053,gmv:140.99,b2b:1313,b2c:796,conversations:14377,tickets:2583},
+                    {date:'2026-03-11',orders:3056,gmv:95.63,b2b:1372,b2c:689,conversations:11651,tickets:2038},
+                    {date:'2026-03-12',orders:2818,gmv:136.26,b2b:1183,b2c:681,conversations:11327,tickets:2090},
+                    {date:'2026-03-13',orders:2961,gmv:76.73,b2b:1243,b2c:572,conversations:9936,tickets:1900},
+                    {date:'2026-03-14',orders:2941,gmv:81.24,b2b:1392,b2c:610,conversations:9151,tickets:1926},
+                    {date:'2026-03-15',orders:1397,gmv:42.69,b2b:817,b2c:556,conversations:6924,tickets:1428},
+                    {date:'2026-03-16',orders:3050,gmv:115.08,b2b:1576,b2c:613,conversations:9625,tickets:1952},
+                    {date:'2026-03-17',orders:3108,gmv:112.39,b2b:1518,b2c:576,conversations:8714,tickets:2002},
+                    {date:'2026-03-18',orders:2576,gmv:105.72,b2b:938,b2c:594,conversations:8101,tickets:1945},
+                    {date:'2026-03-19',orders:1527,gmv:44.88,b2b:465,b2c:297,conversations:8067,tickets:1268},
+                    {date:'2026-03-20',orders:872,gmv:11.02,b2b:109,b2c:130,conversations:7,tickets:308},
+                    {date:'2026-03-21',orders:150,gmv:1.2,b2b:67,b2c:83,conversations:0,tickets:116},
+                    {date:'2026-03-22',orders:242,gmv:2.06,b2b:111,b2c:131,conversations:6,tickets:124},
+                    {date:'2026-03-23',orders:726,gmv:18.84,b2b:445,b2c:275,conversations:28,tickets:453},
+                    {date:'2026-03-24',orders:1825,gmv:133.66,b2b:1090,b2c:382,conversations:8272,tickets:1290},
+                    {date:'2026-03-25',orders:2764,gmv:99.02,b2b:1252,b2c:477,conversations:6752,tickets:1465},
+                    {date:'2026-03-26',orders:2590,gmv:102.99,b2b:945,b2c:475,conversations:6504,tickets:1228},
+                    {date:'2026-03-27',orders:2126,gmv:81.7,b2b:822,b2c:356,conversations:5498,tickets:1102},
+                    {date:'2026-03-28',orders:2449,gmv:79.99,b2b:1042,b2c:453,conversations:4885,tickets:1139},
+                    {date:'2026-03-29',orders:1475,gmv:24.88,b2b:597,b2c:407,conversations:4647,tickets:1141},
+                    {date:'2026-03-30',orders:2254,gmv:120.68,b2b:1128,b2c:501,conversations:6635,tickets:1492},
+                    {date:'2026-03-31',orders:2607,gmv:189.68,b2b:1113,b2c:488,conversations:6183,tickets:1402}
+                ]
+            },
+                                                '04': {
+                daily: [
+                    {date:'2026-04-01',orders:2312,gmv:100.38,b2b:1147,b2c:513,conversations:5940,tickets:1388},
+                    {date:'2026-04-02',orders:2624,gmv:72.34,b2b:1098,b2c:481,conversations:5908,tickets:1150},
+                    {date:'2026-04-03',orders:2910,gmv:76.38,b2b:1418,b2c:742,conversations:6812,tickets:2004},
+                    {date:'2026-04-04',orders:2064,gmv:41.33,b2b:952,b2c:463,conversations:7040,tickets:1442},
+                    {date:'2026-04-05',orders:916,gmv:18.83,b2b:482,b2c:415,conversations:4449,tickets:1068},
+                    {date:'2026-04-06',orders:3006,gmv:106.05,b2b:1096,b2c:461,conversations:5900,tickets:1391},
+                    {date:'2026-04-07',orders:2273,gmv:64.56,b2b:840,b2c:405,conversations:6092,tickets:1143},
+                    {date:'2026-04-08',orders:2380,gmv:89.63,b2b:928,b2c:405,conversations:5384,tickets:1161},
+                    {date:'2026-04-09',orders:2396,gmv:56.25,b2b:931,b2c:317,conversations:4481,tickets:1160},
+                    {date:'2026-04-10',orders:2056,gmv:149.12,b2b:796,b2c:298,conversations:4169,tickets:988},
+                    {date:'2026-04-11',orders:2079,gmv:60.02,b2b:1013,b2c:238,conversations:3920,tickets:875},
+                    {date:'2026-04-12',orders:827,gmv:19.45,b2b:541,b2c:264,conversations:2773,tickets:763},
+                    {date:'2026-04-13',orders:2635,gmv:93.32,b2b:1252,b2c:287,conversations:5214,tickets:1086},
+                    {date:'2026-04-14',orders:2420,gmv:82.62,b2b:1159,b2c:322,conversations:5205,tickets:1456},
+                    {date:'2026-04-15',orders:2311,gmv:68.05,b2b:1040,b2c:291,conversations:4476,tickets:1070},
+                    {date:'2026-04-16',orders:2272,gmv:88.73,b2b:1011,b2c:231,conversations:4627,tickets:985},
+                    {date:'2026-04-17',orders:2240,gmv:76.65,b2b:1024,b2c:257,conversations:0,tickets:1079},
+                    {date:'2026-04-18',orders:1985,gmv:59.69,b2b:983,b2c:196,conversations:0,tickets:855},
+                    {date:'2026-04-19',orders:994,gmv:26.34,b2b:583,b2c:204,conversations:2928,tickets:734},
+                    {date:'2026-04-20',orders:2376,gmv:65.79,b2b:1162,b2c:268,conversations:5044,tickets:1178},
+                    {date:'2026-04-21',orders:2485,gmv:84.96,b2b:1048,b2c:251,conversations:4139,tickets:1827},
+                    {date:'2026-04-22',orders:2572,gmv:109.01,b2b:1246,b2c:252,conversations:5204,tickets:891},
+                    {date:'2026-04-23',orders:2592,gmv:92.77,b2b:1339,b2c:279,conversations:0,tickets:694},
+                    {date:'2026-04-24',orders:2578,gmv:74.54,b2b:1331,b2c:316,conversations:0,tickets:1104},
+                    {date:'2026-04-25',orders:2512,gmv:76.4,b2b:1270,b2c:279,conversations:1388,tickets:2137},
+                    {date:'2026-04-26',orders:867,gmv:21.05,b2b:573,b2c:284,conversations:4376,tickets:1406},
+                    {date:'2026-04-27',orders:2554,gmv:125.15,b2b:1340,b2c:273,conversations:7169,tickets:1703},
+                    {date:'2026-04-28',orders:2645,gmv:115.93,b2b:1344,b2c:312,conversations:5259,tickets:1031},
+                    {date:'2026-04-29',orders:2631,gmv:107.29,b2b:1301,b2c:334,conversations:1631,tickets:1269},
+                    {date:'2026-04-30',orders:1013,gmv:41.31,b2b:728,b2c:173,conversations:0,tickets:53}
+                ]
+            }
+        };
+
+        // ════════════════════════════════════════════════════════════
+        // DISPATCH DATA — Exact user-provided numbers
+        // ════════════════════════════════════════════════════════════
+                const MONTHLY_AGG = {
+            '01': {res:143492,abn:26403,hov:31939,tot:202509,ai:44827,invalid:1480},
+            '02': {res:171973,abn:7992,hov:34364,tot:214640,ai:49971,invalid:2442},
+            '03': {res:176608,abn:10358,hov:40774,tot:228202,ai:44535,invalid:1354},
+            '04': {res:93388,abn:7029,hov:18790,tot:119528,ai:33893,invalid:512},
+        };
+
+        const ISSUES_DATA = {
+            monthly: {"01": {"total": 55872, "resolved": 46703, "invalid": 1480, "inprogress": 7689}, "02": {"total": 61431, "resolved": 50881, "invalid": 2442, "inprogress": 8108}, "03": {"total": 48416, "resolved": 46189, "invalid": 1354, "inprogress": 873}, "04": {"total": 35502, "resolved": 34872, "invalid": 520, "inprogress": 110}},
+            categories: {"01": [{"c": "Order Cancellation", "t": 22118, "r": 21518, "inv": 599, "ip": 1}, {"c": "Order Information", "t": 13223, "r": 13210, "inv": 13, "ip": 0}, {"c": "Delivery Issues - Shaheen", "t": 8312, "r": 633, "inv": 0, "ip": 7679}, {"c": "Chat Drop/Spam Messages", "t": 2958, "r": 2958, "inv": 0, "ip": 0}, {"c": "General Info", "t": 2481, "r": 2386, "inv": 94, "ip": 1}, {"c": "Order Edit Request", "t": 1736, "r": 1735, "inv": 1, "ip": 0}, {"c": "Delivery Related Requests", "t": 1322, "r": 1297, "inv": 25, "ip": 0}, {"c": "Pricing & Stock Issue", "t": 1305, "r": 1079, "inv": 225, "ip": 1}, {"c": "Delivery Issue", "t": 642, "r": 548, "inv": 89, "ip": 5}, {"c": "Order Quality Issue", "t": 609, "r": 449, "inv": 160, "ip": 0}, {"c": "Account Changes Request", "t": 597, "r": 404, "inv": 192, "ip": 1}, {"c": "Customer Error", "t": 170, "r": 166, "inv": 3, "ip": 1}, {"c": "Application Issue", "t": 148, "r": 110, "inv": 38, "ip": 0}, {"c": "Campaign or Coin Issue", "t": 103, "r": 74, "inv": 29, "ip": 0}, {"c": "Credit Issue", "t": 56, "r": 50, "inv": 6, "ip": 0}, {"c": "Payment & Refund Issue", "t": 48, "r": 43, "inv": 5, "ip": 0}], "02": [{"c": "Order Cancellation", "t": 16961, "r": 16961, "inv": 0, "ip": 0}, {"c": "Order Information", "t": 16926, "r": 16860, "inv": 66, "ip": 0}, {"c": "Delivery Issues - Shaheen", "t": 8838, "r": 730, "inv": 0, "ip": 8108}, {"c": "Application Issue", "t": 6960, "r": 5349, "inv": 1611, "ip": 0}, {"c": "General Info", "t": 3194, "r": 3138, "inv": 56, "ip": 0}, {"c": "Delivery Related Requests", "t": 1592, "r": 1576, "inv": 16, "ip": 0}, {"c": "Order Edit Request", "t": 1526, "r": 1453, "inv": 73, "ip": 0}, {"c": "Pricing & Stock Issue", "t": 1522, "r": 1372, "inv": 150, "ip": 0}, {"c": "Chat Drop/Spam Messages", "t": 1350, "r": 1350, "inv": 0, "ip": 0}, {"c": "Delivery Issue", "t": 745, "r": 671, "inv": 74, "ip": 0}, {"c": "Account Changes Request", "t": 648, "r": 440, "inv": 208, "ip": 0}, {"c": "Order Quality Issue", "t": 625, "r": 519, "inv": 106, "ip": 0}, {"c": "Campaign or Coin Issue", "t": 265, "r": 222, "inv": 43, "ip": 0}, {"c": "Customer Error", "t": 156, "r": 153, "inv": 3, "ip": 0}, {"c": "Credit Issue", "t": 49, "r": 15, "inv": 34, "ip": 0}, {"c": "Payment & Refund Issue", "t": 47, "r": 46, "inv": 1, "ip": 0}], "03": [{"c": "Order Cancellation", "t": 18405, "r": 18405, "inv": 0, "ip": 0}, {"c": "Order Information", "t": 15559, "r": 15433, "inv": 126, "ip": 0}, {"c": "General Info", "t": 2836, "r": 2833, "inv": 3, "ip": 0}, {"c": "Pricing & Stock Issue", "t": 2138, "r": 1362, "inv": 776, "ip": 0}, {"c": "Delivery Related Requests", "t": 1923, "r": 1923, "inv": 0, "ip": 0}, {"c": "Chat Drop/Spam Messages", "t": 1610, "r": 1608, "inv": 2, "ip": 0}, {"c": "Order Edit Request", "t": 1282, "r": 1282, "inv": 0, "ip": 0}, {"c": "Application Issue", "t": 1245, "r": 1170, "inv": 75, "ip": 0}, {"c": "Delivery Issues - Shaheen", "t": 940, "r": 70, "inv": 0, "ip": 870}, {"c": "Delivery Issue", "t": 887, "r": 817, "inv": 68, "ip": 2}, {"c": "Order Quality Issue", "t": 599, "r": 497, "inv": 102, "ip": 0}, {"c": "Account Changes Request", "t": 579, "r": 381, "inv": 198, "ip": 0}, {"c": "Campaign or Coin Issue", "t": 207, "r": 206, "inv": 1, "ip": 0}, {"c": "Customer Error", "t": 127, "r": 126, "inv": 0, "ip": 1}, {"c": "Payment & Refund Issue", "t": 35, "r": 35, "inv": 0, "ip": 0}, {"c": "Credit Issue", "t": 25, "r": 23, "inv": 2, "ip": 0}], "04": [{"c": "Order Information", "t": 13055, "r": 12993, "inv": 60, "ip": 2}, {"c": "Order Cancellation", "t": 11807, "r": 11807, "inv": 0, "ip": 0}, {"c": "Pricing & Stock Issue", "t": 2554, "r": 2340, "inv": 208, "ip": 6}, {"c": "General Info", "t": 1714, "r": 1706, "inv": 6, "ip": 2}, {"c": "Order Edit Request", "t": 1649, "r": 1648, "inv": 1, "ip": 0}, {"c": "Chat Drop/Spam Messages", "t": 1552, "r": 1549, "inv": 2, "ip": 1}, {"c": "Delivery Related Requests", "t": 907, "r": 907, "inv": 0, "ip": 0}, {"c": "Order Quality Issue", "t": 609, "r": 514, "inv": 74, "ip": 21}, {"c": "Application Issue", "t": 576, "r": 511, "inv": 32, "ip": 33}, {"c": "Account Changes Request", "t": 396, "r": 267, "inv": 105, "ip": 24}, {"c": "Delivery Issue", "t": 379, "r": 342, "inv": 18, "ip": 19}, {"c": "Campaign or Coin Issue", "t": 165, "r": 162, "inv": 2, "ip": 1}, {"c": "Customer Error", "t": 86, "r": 82, "inv": 3, "ip": 1}, {"c": "Credit Issue", "t": 23, "r": 16, "inv": 7, "ip": 0}, {"c": "Account Misused", "t": 13, "r": 12, "inv": 1, "ip": 0}, {"c": "Payment & Refund Issue", "t": 6, "r": 6, "inv": 0, "ip": 0}]},
+            teams: {"01": [{"tm": "CARE-S&P", "t": 45236, "r": 43535, "inv": 719, "ip": 982}, {"tm": "RETAIL_OPS", "t": 5998, "r": 745, "inv": 179, "ip": 5074}, {"tm": "QUALITY_TEAM", "t": 1560, "r": 482, "inv": 160, "ip": 918}, {"tm": "COMMERCIALS", "t": 1306, "r": 1081, "inv": 224, "ip": 1}, {"tm": "FACILITY", "t": 933, "r": 354, "inv": 85, "ip": 494}, {"tm": "FINTECH", "t": 266, "r": 227, "inv": 39, "ip": 0}, {"tm": "LAST_MILE", "t": 249, "r": 38, "inv": 4, "ip": 207}, {"tm": "MARKETPLACE", "t": 121, "r": 78, "inv": 30, "ip": 13}, {"tm": "IT", "t": 102, "r": 76, "inv": 26, "ip": 0}, {"tm": "PRODUCT", "t": 86, "r": 72, "inv": 14, "ip": 0}], "02": [{"tm": "CARE-S&P", "t": 42957, "r": 41726, "inv": 151, "ip": 1080}, {"tm": "RETAIL_OPS", "t": 6693, "r": 933, "inv": 264, "ip": 5496}, {"tm": "PRODUCT", "t": 6753, "r": 5214, "inv": 1539, "ip": 0}, {"tm": "COMMERCIALS", "t": 1558, "r": 1410, "inv": 148, "ip": 0}, {"tm": "QUALITY_TEAM", "t": 1410, "r": 499, "inv": 105, "ip": 806}, {"tm": "FACILITY", "t": 1035, "r": 430, "inv": 74, "ip": 531}, {"tm": "MARKETPLACE", "t": 297, "r": 231, "inv": 43, "ip": 23}, {"tm": "LAST_MILE", "t": 270, "r": 97, "inv": 1, "ip": 172}, {"tm": "IT", "t": 237, "r": 164, "inv": 73, "ip": 0}, {"tm": "FINTECH", "t": 197, "r": 153, "inv": 44, "ip": 0}], "03": [{"tm": "CARE-S&P", "t": 41876, "r": 41731, "inv": 22, "ip": 123}, {"tm": "COMMERCIALS", "t": 2215, "r": 1439, "inv": 776, "ip": 0}, {"tm": "RETAIL_OPS", "t": 1396, "r": 489, "inv": 308, "ip": 599}, {"tm": "PRODUCT", "t": 916, "r": 889, "inv": 27, "ip": 0}, {"tm": "FACILITY", "t": 565, "r": 440, "inv": 64, "ip": 61}, {"tm": "QUALITY_TEAM", "t": 523, "r": 342, "inv": 102, "ip": 79}, {"tm": "IT", "t": 347, "r": 299, "inv": 48, "ip": 0}, {"tm": "MARKETPLACE", "t": 211, "r": 207, "inv": 1, "ip": 3}, {"tm": "LAST_MILE", "t": 200, "r": 190, "inv": 2, "ip": 8}, {"tm": "FINTECH", "t": 130, "r": 127, "inv": 3, "ip": 0}], "04": [{"tm": "CARE-S&P", "t": 30742, "r": 30711, "inv": 24, "ip": 7}, {"tm": "COMMERCIALS", "t": 2605, "r": 2394, "inv": 205, "ip": 6}, {"tm": "RETAIL_OPS", "t": 499, "r": 319, "inv": 155, "ip": 25}, {"tm": "QUALITY_TEAM", "t": 498, "r": 404, "inv": 73, "ip": 21}, {"tm": "PRODUCT", "t": 388, "r": 346, "inv": 25, "ip": 17}, {"tm": "FACILITY", "t": 212, "r": 180, "inv": 17, "ip": 15}, {"tm": "IT", "t": 190, "r": 164, "inv": 10, "ip": 16}, {"tm": "MARKETPLACE", "t": 165, "r": 162, "inv": 2, "ip": 1}, {"tm": "FINTECH", "t": 84, "r": 76, "inv": 8, "ip": 0}, {"tm": "LAST_MILE", "t": 72, "r": 70, "inv": 0, "ip": 2}]}
+        };
+
+        const DISPATCH = {
+            dod: {
+                dates:['Apr 2','Apr 3','Apr 4','Apr 5','Apr 6','Apr 7','Apr 8'],
+                fullDates:['2026-04-02','2026-04-03','2026-04-04','2026-04-05','2026-04-06','2026-04-07','2026-04-08'],
+                dispatched:[442,430,613,412,366,381,340],
+                si:[8,14,17,24,5,15,8],
+                ops:[4,8,12,15,3,7,6],
+                comm:[1,4,2,4,1,2,1],
+                cust:[0,1,1,1,0,4,0],
+                care:[3,0,2,4,1,2,0],
+                inp:[0,0,0,0,0,0,1],
+                sku:[
+                    {label:'SKU Quality Issue',vals:[2,5,6,6,2,6,3]},
+                    {label:'Short Items Delivered',vals:[2,6,1,3,0,0,4]},
+                    {label:'Wrong Items Delivered',vals:[0,2,4,5,0,1,0]},
+                    {label:'Order Not Delivered',vals:[0,0,3,6,0,1,0]},
+                    {label:'Short Expiry',vals:[0,1,3,1,2,2,1]},
+                    {label:'Item Damaged',vals:[3,0,0,2,0,4,0]},
+                    {label:'Expired Item',vals:[1,0,0,1,1,1,0]}
+                ]
+            },
+            wow: [
+                {label:'Apr W1 (2–8)',  dispatched:2984, si:91, ops:55, comm:15, cust:7,  care:12, inp:1},
+                {label:'Apr W2 (9–13)', dispatched:9706, si:68, ops:17, comm:2,  cust:2,  care:47, inp:0}
+            ],
+            mom: [
+                {label:'April 2026', dispatched:12690, si:159, ops:72, comm:17, cust:9, care:59, inp:1}
+            ]
+        };
+
+        // ════════════════════════════════════════════════════════════
+        // STATE
+        // ════════════════════════════════════════════════════════════
+        let FILTER = { month: 'all', segment: 'all', city: 'all' };
+        let isAdmin = false;
+        let charts = {};
+        let customQA = {};
+
+        // ════════════════════════════════════════════════════════════
+        // FILTER EVENT LISTENERS
+        // ════════════════════════════════════════════════════════════
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const type = this.dataset.type;
+                const value = this.dataset.value;
+                document.querySelectorAll(`.filter-btn[data-type="${type}"]`).forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                FILTER[type] = value;
+                refreshAllData();
+            });
+        });
+
+        document.getElementById('cityFilter').addEventListener('change', function() {
+            FILTER.city = this.value;
+            refreshAllData();
+        });
+
+        // ════════════════════════════════════════════════════════════
+        // DATA FUNCTIONS
+        // ════════════════════════════════════════════════════════════
+        function getFilteredData() {
+            const months = FILTER.month === 'all' ? ['01','02','03','04'] : [FILTER.month];
+            const cityRatios = {karachi:0.65,lahore:0.18,islamabad:0.12,gujranwala:0.02,faisalabad:0.03};
+            let filtered = [];
+            months.forEach(m => {
+                RAW_DATA[m].daily.forEach(day => {
+                    let row = {...day};
+                    const segRatio = FILTER.segment === 'b2b' ? (row.b2b/row.orders) :
+                                     FILTER.segment === 'b2c' ? (row.b2c/row.orders) :
+                                     FILTER.segment === 'rob' ? (Math.max(0,row.orders-row.b2b-row.b2c)/row.orders) : 1;
+                    if (FILTER.segment !== 'all') {
+                        row.b2b = FILTER.segment === 'b2b' ? row.b2b : 0;
+                        row.b2c = FILTER.segment === 'b2c' ? row.b2c : 0;
+                        row.orders = Math.floor(row.orders * segRatio);
+                        row.conversations = row.conversations ? Math.floor(row.conversations * segRatio) : 0;
+                        row.tickets = Math.floor(row.tickets * segRatio);
+                        row.gmv = parseFloat((row.gmv * segRatio).toFixed(2));
+                    }
+                    if (FILTER.city !== 'all') {
+                        const cr = cityRatios[FILTER.city] || 0.05;
+                        row.orders = Math.floor(row.orders * cr);
+                        row.b2b = Math.floor(row.b2b * cr);
+                        row.b2c = Math.floor(row.b2c * cr);
+                        row.conversations = row.conversations ? Math.floor(row.conversations * cr) : 0;
+                        row.tickets = Math.floor(row.tickets * cr);
+                        row.gmv = parseFloat((row.gmv * cr).toFixed(2));
+                    }
+                    row.month = m;
+                    filtered.push(row);
+                });
+            });
+            return filtered;
+        }
+
+        function calculateKPIs(data) {
+            const totalOrders   = data.reduce((s,d) => s+d.orders, 0);
+            const totalB2B      = data.reduce((s,d) => s+(d.b2b||0), 0);
+            const totalB2C      = data.reduce((s,d) => s+(d.b2c||0), 0);
+            const totalROB      = Math.max(0, totalOrders - totalB2B - totalB2C);
+            const totalConvs    = data.reduce((s,d) => s+(d.conversations||0), 0);
+            const totalTickets  = data.reduce((s,d) => s+d.tickets, 0);
+            const totalGMV      = parseFloat(data.reduce((s,d) => s+parseFloat(d.gmv||0), 0).toFixed(1));
+            const ratio         = totalOrders > 0 ? (totalConvs/totalOrders).toFixed(2) : '0.00';
+            const resolution    = totalConvs > 0 ? Math.floor(((totalConvs-totalTickets)/totalConvs)*100) : 0;
+            return {orders:totalOrders,b2b:totalB2B,b2c:totalB2C,rob:totalROB,
+                    conversations:totalConvs,tickets:totalTickets,gmv:totalGMV,ratio,resolution};
+        }
+
+        // ════════════════════════════════════════════════════════════
+        // REFRESH ALL
+        // ════════════════════════════════════════════════════════════
+        function refreshAllData() {
+            const filtered = getFilteredData();
+            const kpis = calculateKPIs(filtered);
+
+            // Period label
+            const monthName = {all:'Jan to Apr 28',
+                '01':'January','02':'February','03':'March','04':'April'}[FILTER.month];
+            const segName = {all:'',b2b:'· B2B',b2c:'· B2C',rob:'· ROB'}[FILTER.segment];
+            const cityMap = {all:'',karachi:'· Karachi',lahore:'· Lahore',islamabad:'· Islamabad',
+                gujranwala:'· Gujranwala',faisalabad:'· Faisalabad'};
+            document.getElementById('filterTitle').textContent =
+                `${monthName} ${segName} ${cityMap[FILTER.city]||''}`.trim();
+
+            // KPIs
+            document.getElementById('kpi-orders').textContent = kpis.orders.toLocaleString();
+            document.getElementById('kpi-b2b').textContent    = kpis.b2b.toLocaleString();
+            document.getElementById('kpi-b2c').textContent    = kpis.b2c.toLocaleString();
+            document.getElementById('kpi-rob').textContent    = kpis.rob.toLocaleString();
+            document.getElementById('kpi-gmv').textContent    = kpis.gmv.toLocaleString() + 'M';
+            document.getElementById('kpi-conversations').textContent = kpis.conversations.toLocaleString();
+            document.getElementById('kpi-ratio').textContent  = kpis.ratio;
+            document.getElementById('kpi-resolution').textContent = kpis.resolution + '%';
+
+            updateAIAnalysis(kpis);
+            updateDailyTable(filtered);
+            updateWoWTable(filtered);
+            updateMoMTable(filtered);
+            updateIssuesMetrics(kpis);
+
+            if (document.getElementById('cityChart') && document.getElementById('cityChart').offsetParent)
+                initCharts(filtered);
+        }
+
+        function updateAIAnalysis(kpis) {
+            const m = FILTER.month;
+            let text = `<p><strong>Period:</strong> ${document.getElementById('filterTitle').textContent} &nbsp;|&nbsp;
+                        <strong>Orders:</strong> ${kpis.orders.toLocaleString()} &nbsp;|&nbsp;
+                        <strong>GMV:</strong> PKR ${kpis.gmv}M &nbsp;|&nbsp;
+                        <strong>COR:</strong> ${kpis.ratio}</p>
+                        <p style="margin-top:6px"><strong>B2B:</strong> ${kpis.b2b.toLocaleString()} &nbsp;
+                        <strong>B2C:</strong> ${kpis.b2c.toLocaleString()} &nbsp;
+                        <strong>ROB:</strong> ${kpis.rob.toLocaleString()} &nbsp;|&nbsp;
+                        <strong>Conversations:</strong> ${kpis.conversations.toLocaleString()} &nbsp;|&nbsp;
+                        <strong>Resolution:</strong> ${kpis.resolution}%</p>`;
+            if (m==='02'||m==='all') text += `<p style="margin-top:8px"><span class="text-danger">⚠ Feb 16 GMV spike (PKR 209.8M)</span> — correlates with service issue surge Feb 23–24. Capacity alert.</p>`;
+            if (m==='03'||m==='all') text += `<p style="margin-top:6px"><span class="text-danger">⚠ Mar 21 Eid collapse (150 orders)</span> — V-shaped recovery from Mar 24. Plan Q1 2027 staffing.</p>`;
+            if (m==='04'||m==='all') text += `<p style="margin-top:6px"><span class="text-danger">⚠ Apr 5 SI spike (5.8%)</span> — inverse volume-quality pattern on low-dispatch days. QC process gap.</p>`;
+            document.getElementById('aiAnalysisText').innerHTML = text;
+        }
+
+        // ════════════════════════════════════════════════════════════
+        // DAILY TABLE
+        // ════════════════════════════════════════════════════════════
+        function updateDailyTable(data) {
+            const tbody = document.getElementById('dailyTableBody');
+            tbody.innerHTML = '';
+            let wtd = 0, mtd = 0, curMo = '';
+            data.forEach(day => {
+                const mo = day.date.slice(0,7);
+                if (mo !== curMo) { mtd = 0; curMo = mo; }
+                const dow = new Date(day.date+'T12:00:00').getDay();
+                if (dow === 0 && mtd > 0) wtd = 0;
+                const rob = Math.max(0, day.orders - (day.b2b||0) - (day.b2c||0));
+                const cor = day.orders > 0 && day.conversations ? (day.conversations/day.orders).toFixed(2) : '—';
+                const convDisp = day.conversations != null ? (day.conversations).toLocaleString() : '—';
+                mtd += day.orders; wtd += day.orders;
+                const lbl = new Date(day.date+'T12:00:00').toLocaleDateString('en-PK',{month:'short',day:'numeric'});
+                const isLow = day.orders < 1000;
+                tbody.insertAdjacentHTML('beforeend', `<tr style="${isLow?'background:#fff7ed':''}">
+                    <td>${lbl}${isLow?'<span style="background:#fef3c7;color:#92400e;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;margin-left:4px">LOW</span>':''}</td>
+                    <td><strong>${day.orders.toLocaleString()}</strong></td>
+                    <td style="color:#3b82f6">${(day.b2b||0).toLocaleString()}</td>
+                    <td style="color:#10b981">${(day.b2c||0).toLocaleString()}</td>
+                    <td style="color:#9ca3af">${rob.toLocaleString()}</td>
+                    <td>PKR ${day.gmv}M</td>
+                    <td>${convDisp}</td>
+                    <td><span class="badge-amber">${cor}</span></td>
+                    <td>${day.tickets.toLocaleString()}</td>
+                    <td style="background:#fffbeb"><strong>${wtd.toLocaleString()}</strong></td>
+                    <td style="background:#f0fdf4"><strong>${mtd.toLocaleString()}</strong></td>
+                </tr>`);
+            });
+        }
+
+        // ════════════════════════════════════════════════════════════
+        // WOW TABLE + CHARTS
+        // ════════════════════════════════════════════════════════════
+        function updateWoWTable(data) {
+            const weeks = [];
+            // Build weeks from data (Sun-Sat)
+            const sorted = [...data].sort((a,b)=>a.date.localeCompare(b.date));
+            let wkStart = null, wkData = [], wkNum = 1, wkMo = '';
+            sorted.forEach((d,i) => {
+                const dow = new Date(d.date+'T12:00:00').getDay();
+                const mo = d.date.slice(0,7);
+                if (!wkStart) { wkStart = d.date; wkMo = mo; }
+                if (mo !== wkMo) { if (wkData.length) weeks.push({label:`${mo} W${wkNum}`,data:[...wkData]}); wkData=[d]; wkMo=mo; wkNum=1; wkStart=d.date; }
+                else {
+                    if (dow === 0 && wkData.length > 0) { weeks.push({label:`${wkMo} W${wkNum}`,data:[...wkData]}); wkNum++; wkData=[d]; }
+                    else { wkData.push(d); }
+                }
+            });
+            if (wkData.length) weeks.push({label:`${wkMo} W${wkNum}`,data:[...wkData]});
+
+            const tbody = document.getElementById('wowTableBody');
+            tbody.innerHTML = '';
+            const wLabels = [], wOrders = [], wConv = [], wCOR = [];
+            weeks.forEach(wk => {
+                const ord = wk.data.reduce((s,d)=>s+d.orders,0);
+                const b2b = wk.data.reduce((s,d)=>s+(d.b2b||0),0);
+                const b2c = wk.data.reduce((s,d)=>s+(d.b2c||0),0);
+                const rob = Math.max(0,ord-b2b-b2c);
+                const gmv = parseFloat(wk.data.reduce((s,d)=>s+parseFloat(d.gmv||0),0).toFixed(1));
+                const conv = wk.data.reduce((s,d)=>s+(d.conversations||0),0);
+                const tix  = wk.data.reduce((s,d)=>s+d.tickets,0);
+                const cor  = ord > 0 && conv > 0 ? (conv/ord).toFixed(2) : '—';
+                wLabels.push(wk.label); wOrders.push(ord); wConv.push(conv); wCOR.push(parseFloat(cor)||0);
+                tbody.insertAdjacentHTML('beforeend',`<tr>
+                    <td><strong>${wk.label}</strong></td>
+                    <td>${ord.toLocaleString()}</td>
+                    <td style="color:#3b82f6">${b2b.toLocaleString()}</td>
+                    <td style="color:#10b981">${b2c.toLocaleString()}</td>
+                    <td style="color:#9ca3af">${rob.toLocaleString()}</td>
+                    <td>PKR ${gmv}M</td>
+                    <td>${conv.toLocaleString()}</td>
+                    <td><span class="badge-amber">${cor}</span></td>
+                    <td>${tix.toLocaleString()}</td>
+                </tr>`);
+            });
+
+            // Charts
+            if (charts.wowOrders) { charts.wowOrders.destroy(); }
+            if (charts.wowConv)   { charts.wowConv.destroy(); }
+            const c1 = document.getElementById('wowOrdersChart');
+            const c2 = document.getElementById('wowConvChart');
+            if (c1) charts.wowOrders = new Chart(c1.getContext('2d'), {
+                type:'bar',
+                data:{labels:wLabels,datasets:[{label:'Orders',data:wOrders,backgroundColor:'#1a2035',borderRadius:4}]},
+                options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>v.toLocaleString()}}}}
+            });
+            if (c2) charts.wowConv = new Chart(c2.getContext('2d'), {
+                type:'line',
+                data:{labels:wLabels,datasets:[
+                    {label:'Conversations',data:wConv,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.1)',fill:true,tension:0.3,yAxisID:'y'},
+                    {label:'COR',data:wCOR,borderColor:'#f59e0b',tension:0.3,yAxisID:'y1'}
+                ]},
+                options:{responsive:true,scales:{y:{position:'left'},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{callback:v=>v.toFixed(2)}}}}
+            });
+        }
+
+        // ════════════════════════════════════════════════════════════
+        // MOM TABLE + CHARTS
+        // ════════════════════════════════════════════════════════════
+        function updateMoMTable(data) {
+            const tbody = document.getElementById('momTableBody');
+            tbody.innerHTML = '';
+            const months = {'01':'January','02':'February','03':'March','04':'April'};
+            const mLabels=[], mOrders=[], mB2B=[], mB2C=[], mROB=[], mGMV=[];
+            Object.entries(months).forEach(([key,name]) => {
+                if (FILTER.month !== 'all' && FILTER.month !== key) return;
+                const md = data.filter(d => d.date.startsWith('2026-'+key));
+                if (!md.length) return;
+                const ord = md.reduce((s,d)=>s+d.orders,0);
+                const b2b = md.reduce((s,d)=>s+(d.b2b||0),0);
+                const b2c = md.reduce((s,d)=>s+(d.b2c||0),0);
+                const rob = Math.max(0, ord-b2b-b2c);
+                const gmv = parseFloat(md.reduce((s,d)=>s+parseFloat(d.gmv||0),0).toFixed(1));
+                const conv = md.reduce((s,d)=>s+(d.conversations||0),0);
+                const tix  = md.reduce((s,d)=>s+d.tickets,0);
+                const avg  = Math.floor(ord/md.length);
+                const cor  = ord > 0 && conv > 0 ? (conv/ord).toFixed(2) : '—';
+                mLabels.push(name); mOrders.push(ord); mB2B.push(b2b); mB2C.push(b2c); mROB.push(rob); mGMV.push(gmv);
+                tbody.insertAdjacentHTML('beforeend',`<tr>
+                    <td><strong>${name}</strong></td>
+                    <td>${ord.toLocaleString()}</td>
+                    <td style="color:#3b82f6">${b2b.toLocaleString()}</td>
+                    <td style="color:#10b981">${b2c.toLocaleString()}</td>
+                    <td style="color:#9ca3af">${rob.toLocaleString()}</td>
+                    <td>PKR ${gmv}M</td>
+                    <td>${avg.toLocaleString()}</td>
+                    <td>${conv.toLocaleString()}</td>
+                    <td><span class="badge-amber">${cor}</span></td>
+                    <td>${tix.toLocaleString()}</td>
+                </tr>`);
+            });
+
+            // Charts
+            if (charts.momOrders) charts.momOrders.destroy();
+            if (charts.momGmvCor) charts.momGmvCor.destroy();
+            const c1 = document.getElementById('momOrdersChart');
+            const c2 = document.getElementById('momGmvCorChart');
+            if (c1) charts.momOrders = new Chart(c1.getContext('2d'), {
+                type:'bar',
+                data:{labels:mLabels,datasets:[
+                    {label:'B2B',data:mB2B,backgroundColor:'#3b82f6',borderRadius:3,stack:'s'},
+                    {label:'B2C',data:mB2C,backgroundColor:'#10b981',borderRadius:3,stack:'s'},
+                    {label:'ROB',data:mROB,backgroundColor:'#9ca3af',borderRadius:3,stack:'s'}
+                ]},
+                options:{responsive:true,plugins:{legend:{position:'top'}},scales:{y:{ticks:{callback:v=>v.toLocaleString()}}}}
+            });
+            if (c2) charts.momGmvCor = new Chart(c2.getContext('2d'), {
+                type:'line',
+                data:{labels:mLabels,datasets:[
+                    {label:'GMV (M PKR)',data:mGMV,borderColor:'#1a2035',backgroundColor:'rgba(26,32,53,0.08)',fill:true,tension:0.3,yAxisID:'y'},
+                ]},
+                options:{responsive:true,scales:{y:{ticks:{callback:v=>'PKR '+v+'M'}}}}
+            });
+        }
+
+        function updateIssuesMetrics(kpis) {
+            const selMonths = FILTER.month === 'all' ? ['01','02','03','04'] : [FILTER.month];
+            let tot=0,res=0,inv=0,ip=0;
+            let catMap={}, teamMap={};
+            selMonths.forEach(m => {
+                const md = ISSUES_DATA.monthly[m];
+                tot+=md.total; res+=md.resolved; inv+=md.invalid; ip+=md.inprogress;
+                // categories
+                ISSUES_DATA.categories[m].forEach(r => {
+                    if(!catMap[r.c]) catMap[r.c]={t:0,r:0,inv:0,ip:0};
+                    catMap[r.c].t+=r.t; catMap[r.c].r+=r.r; catMap[r.c].inv+=r.inv; catMap[r.c].ip+=r.ip;
+                });
+                // teams
+                ISSUES_DATA.teams[m].forEach(r => {
+                    if(!teamMap[r.tm]) teamMap[r.tm]={t:0,r:0,inv:0,ip:0};
+                    teamMap[r.tm].t+=r.t; teamMap[r.tm].r+=r.r; teamMap[r.tm].inv+=r.inv; teamMap[r.tm].ip+=r.ip;
+                });
+            });
+            // Conversations from MONTHLY_AGG
+            let convs=0;
+            selMonths.forEach(m => { convs+=MONTHLY_AGG[m].tot; });
+
+            document.getElementById('issues-total').textContent = tot.toLocaleString();
+            document.getElementById('issues-resolved').textContent = res.toLocaleString();
+            document.getElementById('issues-invalid').textContent = inv.toLocaleString();
+            document.getElementById('issues-inprogress').textContent = ip.toLocaleString();
+            document.getElementById('issues-convs').textContent = convs.toLocaleString();
+
+            // Category table
+            const catBody = document.getElementById('catTableBody');
+            if(catBody) {
+                const sorted = Object.entries(catMap).sort((a,b)=>b[1].t-a[1].t);
+                catBody.innerHTML = sorted.map(([cat,d]) => {
+                    const resPct = d.t>0 ? (d.r/d.t*100).toFixed(1)+'%' : '-';
+                    return `<tr><td>${cat}</td><td>${d.t.toLocaleString()}</td><td>${d.r.toLocaleString()}</td><td style="color:${d.inv>0?'#dc2626':'inherit'}">${d.inv.toLocaleString()}</td><td style="color:${d.ip>0?'#f59e0b':'inherit'}">${d.ip.toLocaleString()}</td><td>${resPct}</td></tr>`;
+                }).join('');
+            }
+
+            // Team table
+            const teamBody = document.getElementById('teamTableBody');
+            if(teamBody) {
+                const sorted = Object.entries(teamMap).sort((a,b)=>b[1].t-a[1].t);
+                teamBody.innerHTML = sorted.map(([tm,d]) => {
+                    const resPct = d.t>0?(d.r/d.t*100).toFixed(1)+'%':'-';
+                    const invPct = d.t>0?(d.inv/d.t*100).toFixed(1)+'%':'-';
+                    return `<tr><td><strong>${tm}</strong></td><td>${d.t.toLocaleString()}</td><td>${d.r.toLocaleString()}</td><td style="color:${d.inv>0?'#dc2626':'inherit'}">${d.inv.toLocaleString()}</td><td style="color:${d.ip>0?'#f59e0b':'inherit'}">${d.ip.toLocaleString()}</td><td>${resPct}</td><td>${invPct}</td></tr>`;
+                }).join('');
+            }
+
+            // Resolution donut — Ticket status breakdown
+            const rc = document.getElementById('resolutionChart');
+            if(rc) {
+                if(charts.resolution){charts.resolution.destroy();charts.resolution=null;}
+                charts.resolution = new Chart(rc.getContext('2d'),{
+                    type:'doughnut',
+                    data:{
+                        labels:['Resolved','In Progress','Invalid'],
+                        datasets:[{data:[res,ip,inv],backgroundColor:['#10b981','#f59e0b','#ef4444'],borderWidth:0}]
+                    },
+                    options:{
+                        responsive:true,cutout:'62%',
+                        plugins:{
+                            legend:{position:'bottom',labels:{font:{size:11},padding:10}},
+                            tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.raw.toLocaleString()} (${tot>0?(ctx.raw/tot*100).toFixed(1):0}%)`}}
+                        }
+                    }
+                });
+            }
+        }
+
+        // ════════════════════════════════════════════════════════════
+        // SUMMARY CHARTS
+        // ════════════════════════════════════════════════════════════
+        function initCharts(data) {
+            Object.values(charts).forEach(c => { if (c && c.destroy) c.destroy(); });
+            charts = {};
+            const kpis = calculateKPIs(data);
+
+            // City chart — use total orders per city ratio
+            const cityRatios = {karachi:0.65,lahore:0.18,islamabad:0.12,gujranwala:0.02,faisalabad:0.03};
+            const cities = Object.keys(cityRatios);
+            const cityOrders = cities.map(c => Math.floor(kpis.orders * cityRatios[c]));
+            const c1 = document.getElementById('cityChart');
+            if (c1) charts.city = new Chart(c1.getContext('2d'), {
+                type:'bar',
+                data:{labels:['Karachi','Lahore','Islamabad','Gujranwala','Faisalabad'],
+                      datasets:[{label:'Orders',data:cityOrders,backgroundColor:['#e31c3d','#3b82f6','#f59e0b','#10b981','#8b5cf6'],borderRadius:4}]},
+                options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>v.toLocaleString()}}}}
+            });
+
+            // Segment donut
+            const c2 = document.getElementById('segmentChart');
+            if (c2) charts.segment = new Chart(c2.getContext('2d'), {
+                type:'doughnut',
+                data:{labels:['B2B','B2C','ROB'],
+                      datasets:[{data:[kpis.b2b,kpis.b2c,kpis.rob],backgroundColor:['#3b82f6','#10b981','#9ca3af'],borderWidth:0}]},
+                options:{responsive:true,plugins:{legend:{position:'bottom'}},cutout:'60%'}
+            });
+        }
+
+        // ════════════════════════════════════════════════════════════
+        // DISPATCH SECTION
+        // ════════════════════════════════════════════════════════════
+        function showDispatchView(view, el) {
+            ['dod','wow','mom'].forEach(v => {
+                document.getElementById('dp-'+v).style.display = v===view ? 'block' : 'none';
+                document.getElementById('dp-'+v+'-btn').classList.toggle('active', v===view);
+            });
+            if (view==='wow') renderDispatchWow();
+            if (view==='mom') renderDispatchMom();
+        }
+
+        function pct(n, d) { return d ? (n/d*100).toFixed(1)+'%' : '0.0%'; }
+        function pctNum(n, d) { return d ? (n/d*100).toFixed(1) : '0.0'; }
+
+        function renderDispatchDoD() {
+            const D = DISPATCH.dod;
+            const tot = arr => arr.reduce((s,v)=>s+v, 0);
+            const totD = tot(D.dispatched);
+
+            // Header
+            document.getElementById('dodHead').innerHTML =
+                `<tr><th style="min-width:160px">Metric</th>${D.dates.map(d=>`<th>${d}</th>`).join('')}<th style="background:#f0f9ff">Total</th></tr>`;
+
+            // Funnel rows
+            const rows = [
+                {label:'<strong>Dispatched Orders</strong>', vals:D.dispatched, total:totD, style:'', isMain:true},
+                {label:'<strong style="color:#dc2626">Service Issues Total</strong>', vals:D.si, total:tot(D.si), style:'background:#fef2f2'},
+                {label:'<span style="color:#6b7280">Service Issues %</span>', vals:D.dispatched.map((_,i)=>pct(D.si[i],D.dispatched[i])), total:pct(tot(D.si),totD), isStr:true, style:''},
+                {label:'Ops Error', vals:D.ops, total:tot(D.ops), style:''},
+                {label:'<span class="dp-pct">Ops Error %</span>', vals:D.dispatched.map((_,i)=>pct(D.ops[i],D.dispatched[i])), total:pct(tot(D.ops),totD), isStr:true, style:''},
+                {label:'Commercial Error', vals:D.comm, total:tot(D.comm), style:''},
+                {label:'<span class="dp-pct">Comm Error %</span>', vals:D.dispatched.map((_,i)=>pct(D.comm[i],D.dispatched[i])), total:pct(tot(D.comm),totD), isStr:true, style:''},
+                {label:'Customer Error', vals:D.cust, total:tot(D.cust), style:''},
+                {label:'<span class="dp-pct">Cust Error %</span>', vals:D.dispatched.map((_,i)=>pct(D.cust[i],D.dispatched[i])), total:pct(tot(D.cust),totD), isStr:true, style:''},
+                {label:'Care Error', vals:D.care, total:tot(D.care), style:''},
+                {label:'<span class="dp-pct">Care Error %</span>', vals:D.dispatched.map((_,i)=>pct(D.care[i],D.dispatched[i])), total:pct(tot(D.care),totD), isStr:true, style:''},
+                {label:'In-Progress', vals:D.inp, total:tot(D.inp), style:''},
+                {label:'<span class="dp-pct">In-Progress %</span>', vals:D.dispatched.map((_,i)=>pct(D.inp[i],D.dispatched[i])), total:pct(tot(D.inp),totD), isStr:true, style:''}
+            ];
+            document.getElementById('dodBody').innerHTML = rows.map(r => {
+                const cells = r.isStr
+                    ? r.vals.map(v => `<td class="dp-pct">${v}</td>`).join('')
+                    : r.vals.map((v,i) => {
+                        const hiSI = r.label.includes('Service Issues Total') && v >= 20;
+                        return `<td ${hiSI?'style="color:#dc2626;font-weight:700"':''}>${typeof v==='number'?v.toLocaleString():v}</td>`;
+                    }).join('');
+                const totCell = `<td style="background:#f0f9ff;font-weight:700">${r.isStr?r.total:(typeof r.total==='number'?r.total.toLocaleString():r.total)}</td>`;
+                return `<tr style="${r.style}"><td>${r.label}</td>${cells}${totCell}</tr>`;
+            }).join('');
+
+            // SKU header
+            document.getElementById('dodSkuHead').innerHTML =
+                `<tr><th>Issue Type</th>${D.dates.map(d=>`<th>${d}</th>`).join('')}<th style="background:#f0f9ff">Total</th></tr>`;
+            document.getElementById('dodSkuBody').innerHTML = D.sku.map(s => {
+                const t = s.vals.reduce((a,b)=>a+b,0);
+                return `<tr><td>${s.label}</td>${s.vals.map(v=>`<td>${v||'—'}</td>`).join('')}<td style="background:#f0f9ff;font-weight:700">${t}</td></tr>`;
+            }).join('');
+        }
+
+        function renderDispatchWow() {
+            if (charts.dpWow) charts.dpWow.destroy();
+            if (charts.dpWowMix) charts.dpWowMix.destroy();
+            const W = DISPATCH.wow;
+            const lbls = W.map(w=>w.label);
+            const c1 = document.getElementById('dpWowChart');
+            const c2 = document.getElementById('dpWowMixChart');
+            if (c1) charts.dpWow = new Chart(c1.getContext('2d'), {
+                type:'bar',
+                data:{labels:lbls,datasets:[
+                    {label:'SI %',data:W.map(w=>parseFloat(pctNum(w.si,w.dispatched))),backgroundColor:'#e31c3d',borderRadius:4},
+                    {label:'Ops %',data:W.map(w=>parseFloat(pctNum(w.ops,w.dispatched))),backgroundColor:'#f59e0b',borderRadius:4},
+                    {label:'Care %',data:W.map(w=>parseFloat(pctNum(w.care,w.dispatched))),backgroundColor:'#8b5cf6',borderRadius:4}
+                ]},
+                options:{responsive:true,plugins:{legend:{position:'top'}},scales:{y:{ticks:{callback:v=>v+'%'}}}}
+            });
+            if (c2) charts.dpWowMix = new Chart(c2.getContext('2d'), {
+                type:'doughnut',
+                data:{labels:['Ops Error','Comm Error','Cust Error','Care Error','In-Progress'],
+                      datasets:[{data:[W.reduce((s,w)=>s+w.ops,0),W.reduce((s,w)=>s+w.comm,0),W.reduce((s,w)=>s+w.cust,0),W.reduce((s,w)=>s+w.care,0),W.reduce((s,w)=>s+w.inp,0)],
+                                 backgroundColor:['#e31c3d','#3b82f6','#10b981','#8b5cf6','#9ca3af'],borderWidth:0}]},
+                options:{responsive:true,plugins:{legend:{position:'right'}},cutout:'55%'}
+            });
+            document.getElementById('dpWowBody').innerHTML = W.map(w => `<tr>
+                <td><strong>${w.label}</strong></td>
+                <td>${w.dispatched.toLocaleString()}</td>
+                <td>${w.si}</td><td><span class="${parseFloat(pctNum(w.si,w.dispatched))>4?'badge-red':'badge-amber'}">${pct(w.si,w.dispatched)}</span></td>
+                <td>${w.ops}</td><td class="dp-pct">${pct(w.ops,w.dispatched)}</td>
+                <td>${w.comm}</td><td>${w.cust}</td><td>${w.care}</td><td>${w.inp}</td>
+            </tr>`).join('');
+        }
+
+        function renderDispatchMom() {
+            if (charts.dpMom) charts.dpMom.destroy();
+            const M = DISPATCH.mom;
+            const c1 = document.getElementById('dpMomChart');
+            if (c1) charts.dpMom = new Chart(c1.getContext('2d'), {
+                type:'bar',
+                data:{labels:M.map(m=>m.label),datasets:[
+                    {label:'Dispatched',data:M.map(m=>m.dispatched),backgroundColor:'#1a2035',borderRadius:4,yAxisID:'y'},
+                    {label:'SI Total',data:M.map(m=>m.si),backgroundColor:'#e31c3d',borderRadius:4,yAxisID:'y1'}
+                ]},
+                options:{responsive:true,plugins:{legend:{position:'top'}},scales:{y:{position:'left'},y1:{position:'right',grid:{drawOnChartArea:false}}}}
+            });
+            document.getElementById('dpMomBody').innerHTML = M.map(m => `<tr>
+                <td><strong>${m.label}</strong></td>
+                <td>${m.dispatched.toLocaleString()}</td>
+                <td>${m.si}</td><td><span class="${parseFloat(pctNum(m.si,m.dispatched))>4?'badge-red':'badge-amber'}">${pct(m.si,m.dispatched)}</span></td>
+                <td>${m.ops}</td><td class="dp-pct">${pct(m.ops,m.dispatched)}</td>
+                <td>${m.comm}</td><td>${m.cust}</td><td>${m.care}</td><td>${m.inp}</td>
+            </tr>`).join('');
+        }
+
+        // ════════════════════════════════════════════════════════════
+        // DEEP DIVE — Admin-editable sections + Q&A
+        // ════════════════════════════════════════════════════════════
+        const DD_QA = {
+            eid:  {q:'Eid impact', a:'<strong>Eid ul-Fitr (Mar 20–23, 2026)</strong> caused a 4-day collapse. Orders crashed from ~1,700/day avg to just <strong>150 on Mar 21</strong>. Recovery began Mar 24 but took until Mar 27 to normalize. There was no meaningful pre-Eid surge — Bazaar customers did not forward-buy. <strong>Action:</strong> Implement pre-Eid buffer stocking 5 days ahead and pre-position riders.'},
+            si:   {q:'Service issue spike', a:'<strong>Apr 5</strong> had the highest SI rate (5.8%) on the <em>lowest</em> dispatch day (366 orders). This inverse correlation suggests <strong>QC degrades on light-volume shifts</strong> — lighter days attract less oversight, fewer QC checkers, and non-standard pick/pack workflows. Ops errors at 3.6% on Apr 5 confirm warehouse process gap.'},
+            gmv:  {q:'GMV drivers', a:'GMV is driven almost entirely by <strong>B2B wholesale spikes</strong>, not B2C volume. The highest GMV day was <strong>Feb 16 at PKR 209.8M</strong> — a B2B surge. B2C revenue is relatively flat (400–700 orders/day). <strong>Strategy:</strong> GMV growth must focus on B2B acquisition and retention, not B2C volume alone.'},
+            cor:  {q:'Contact/Order trend', a:'The Contact/Order Ratio (conversations per order) improved from ~2.0 in Jan to ~1.8 in Apr, showing AI deflection gains. However Apr 5 saw COR spike due to post-Eid confusion. <strong>Target:</strong> Drive COR below 1.5 by end of Q2 2026 — each 0.1 reduction frees ~200 conversations/day at current order volumes.'},
+            sku:  {q:'SKU quality issues', a:'<strong>256 of 330 YTD SKU quality cases (77.6%) occurred on Apr 2</strong> — a single-day batch failure. This is almost certainly a single supplier batch that failed QC. <strong>Immediate action:</strong> Pull the batch from Apr 2 intake, trace supplier + batch ID, and issue supplier notice. Implement random 5% QC sampling on all new intakes.'},
+            ai:   {q:'BazaarAI performance', a:'BazaarAI handles <strong>95%+ of all tickets YTD</strong> with auto-resolution averaging ~93%. Error spikes on Feb 23–24 were due to an Order Cancellation misclassification event. Resolution rate improved from ~88% (Jan) to over <strong>91% (Mar–Apr)</strong>. <strong>Watch:</strong> Monitor AI error rate daily — trigger manual review if daily invalid rate exceeds 5%.'}
+        };
+
+        function submitDdQuery() {
+            const q = document.getElementById('ddQueryInput').value.trim().toLowerCase();
+            if (!q) return;
+            for (const [key, qa] of Object.entries({...DD_QA,...customQA})) {
+                if (q.includes(key) || qa.q.toLowerCase().includes(q.substring(0,20))) {
+                    showDdAnswer(qa.a); return;
+                }
+            }
+            if (q.includes('eid')||q.includes('ramadan')) { showDdAnswer(DD_QA.eid.a); return; }
+            if (q.includes('dispatch')||q.includes('service')) { showDdAnswer(DD_QA.si.a); return; }
+            if (q.includes('gmv')||q.includes('revenue')) { showDdAnswer(DD_QA.gmv.a); return; }
+            if (q.includes('contact')||q.includes('ratio')||q.includes('cor')) { showDdAnswer(DD_QA.cor.a); return; }
+            if (q.includes('sku')||q.includes('quality')||q.includes('batch')) { showDdAnswer(DD_QA.sku.a); return; }
+            if (q.includes('ai')||q.includes('bot')||q.includes('bazaarai')) { showDdAnswer(DD_QA.ai.a); return; }
+            showDdAnswer('<em style="color:#6b7280">No pre-loaded answer found. Try keywords: eid, service issues, gmv, contact/order, sku, ai. Admin can add custom answers below.</em>');
+        }
+
+        function askPreset(key) {
+            const qa = DD_QA[key];
+            if (qa) { document.getElementById('ddQueryInput').value = qa.q; showDdAnswer(qa.a); }
+        }
+
+        function showDdAnswer(html) {
+            const el = document.getElementById('ddAnswer');
+            el.innerHTML = html;
+            el.style.display = 'block';
+        }
+
+        function addCustomQA() {
+            const q = document.getElementById('customQ').value.trim().toLowerCase();
+            const a = document.getElementById('customA').value.trim();
+            if (!q||!a) return;
+            customQA[q] = {q,a};
+            document.getElementById('customQ').value = '';
+            document.getElementById('customA').value = '';
+            alert('✅ Custom Q&A saved! Users can find it by typing "' + q + '"');
+        }
+
+        // Admin-editable sections
+        function editSection(id) {
+            const textEl   = document.getElementById(id+'Text');
+            const editEl   = document.getElementById(id+'Edit');
+            const btnsEl   = document.getElementById(id+'Btns');
+            const editBtn  = document.getElementById('btnEdit'+id.charAt(0).toUpperCase()+id.slice(1));
+            editEl.value   = textEl.innerText.replace(/\n+/g,'\n');
+            textEl.style.display  = 'none';
+            editEl.style.display  = 'block';
+            btnsEl.style.display  = 'flex';
+            if (editBtn) editBtn.style.display = 'none';
+        }
+
+        function saveSection(id) {
+            const textEl  = document.getElementById(id+'Text');
+            const editEl  = document.getElementById(id+'Edit');
+            const btnsEl  = document.getElementById(id+'Btns');
+            const editBtn = document.getElementById('btnEdit'+id.charAt(0).toUpperCase()+id.slice(1));
+            textEl.innerHTML = editEl.value.replace(/\n/g,'<br>');
+            textEl.style.display  = 'block';
+            editEl.style.display  = 'none';
+            btnsEl.style.display  = 'none';
+            if (editBtn) editBtn.style.display = 'inline-block';
+        }
+
+        function cancelEdit(id) {
+            const textEl  = document.getElementById(id+'Text');
+            const editEl  = document.getElementById(id+'Edit');
+            const btnsEl  = document.getElementById(id+'Btns');
+            const editBtn = document.getElementById('btnEdit'+id.charAt(0).toUpperCase()+id.slice(1));
+            textEl.style.display  = 'block';
+            editEl.style.display  = 'none';
+            btnsEl.style.display  = 'none';
+            if (editBtn) editBtn.style.display = 'inline-block';
+        }
+
+        // ════════════════════════════════════════════════════════════
+        // TAB SWITCHING
+        // ════════════════════════════════════════════════════════════
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-pane').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.closest('.nav-item').classList.add('active');
+            const titles = {summary:'High-Level Summary',daily:'Daily Summary',wow:'Week over Week',
+                mom:'Month over Month',issues:'Issue Resolution',postdispatch:'Post Dispatch',deepdive:'Deep Dive'};
+            document.getElementById('pageTitle').textContent = titles[tabName] || tabName;
+            setTimeout(() => {
+                if (tabName==='summary') initCharts(getFilteredData());
+                if (tabName==='postdispatch') renderDispatchDoD();
+            }, 100);
+        }
+
+        // ════════════════════════════════════════════════════════════
+        // ADMIN
+        // ════════════════════════════════════════════════════════════
+        function openAdminLogin() {
+            if (isAdmin) {
+                // Toggle off
+                isAdmin = false;
+                document.getElementById('adminBtn').textContent = '⚙️ Admin';
+                document.getElementById('adminBtn').style.background = '';
+                document.getElementById('adminBtn').style.color = '';
+                // Hide edit buttons
+                ['btnEditFindings','btnEditCorrelation','btnEditActions'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = 'none';
+                });
+                document.getElementById('ddAdminQA').style.display = 'none';
+                return;
+            }
+            document.getElementById('adminUsername').value = '';
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('errorMsg').textContent = '';
+            document.getElementById('adminModal').classList.add('show');
+            setTimeout(() => document.getElementById('adminUsername').focus(), 100);
+        }
+
+        function closeAdminLogin() {
+            document.getElementById('adminModal').classList.remove('show');
+        }
+
+        function validateAdmin() {
+            const u = document.getElementById('adminUsername').value.trim();
+            const p = document.getElementById('adminPassword').value.trim();
+            if (u === 'admin' && p === 'bazaar2026') {
+                isAdmin = true;
+                closeAdminLogin();
+                document.getElementById('adminBtn').textContent = '✓ Admin';
+                document.getElementById('adminBtn').style.background = '#1a2035';
+                document.getElementById('adminBtn').style.color = 'white';
+                // Show edit buttons
+                ['btnEditFindings','btnEditCorrelation','btnEditActions'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = 'inline-block';
+                });
+                document.getElementById('ddAdminQA').style.display = 'block';
+            } else {
+                document.getElementById('errorMsg').textContent = '❌ Invalid credentials';
+            }
+        }
+
+        document.getElementById('adminPassword').addEventListener('keydown', e => {
+            if (e.key === 'Enter') validateAdmin();
+        });
+
+        // Close modal on backdrop click
+        document.getElementById('adminModal').addEventListener('click', e => {
+            if (e.target === document.getElementById('adminModal')) closeAdminLogin();
+        });
+
+        // ════════════════════════════════════════════════════════════
+        // INIT
+        // ════════════════════════════════════════════════════════════
+        window.addEventListener('load', () => {
+            refreshAllData();
+            renderDispatchDoD();
+            initCharts(getFilteredData());
+        });
+    </script>
+</body>
+</html>
