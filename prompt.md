@@ -82,6 +82,15 @@ Create a separate folder under `Analytics` named **Business Pulse**. Build a **d
 ### Source table
 All issue/ticket metrics come from **`hive.bazaar_care_silver.issues`** — NOT from the conversations table.
 
+### Mandatory filters (apply before any aggregation)
+
+| Filter | Rule |
+|--------|------|
+| `issue_type` | **Only** include rows where `issue_type = 'CUSTOMER_SUPPORT_ISSUE'` |
+| `issue_category` | **Exclude** rows where `issue_category = 'Chat Drop/Spam Messages'` |
+
+These two filters must be applied in every query against `bazaar_care_silver.issues`, regardless of which metric or breakdown is being calculated.
+
 ### Key columns
 
 | Column | Purpose |

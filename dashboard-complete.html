@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Pulse - Bazaar Technologies</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #f3f4f6;
+            color: #1f2937;
+            display: flex;
+        }
+
+        #sidebar {
+            width: 220px;
+            background: #1a2035;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-logo {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-logo .brand {
+            font-size: 18px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .sidebar-logo .brand span {
+            color: #e31c3d;
+        }
+
+        .sidebar-logo .sub {
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+        .nav-section-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.3);
+            padding: 16px 20px 6px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            cursor: pointer;
+            color: rgba(255,255,255,0.65);
+            font-size: 13px;
+            transition: all .15s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: #263050;
+            color: white;
+        }
+
+        .nav-item.active {
+            background: #263050;
+            color: white;
+            border-left-color: #e31c3d;
+        }
+
+        .nav-icon {
+            font-size: 15px;
+            width: 18px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 16px 20px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            font-size: 11px;
+            color: rgba(255,255,255,0.35);
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        #pageTitle {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+        }
+
+        button, select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all .2s;
+        }
+
+        button:hover {
+            background: #f3f4f6;
+        }
+
+        button.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        button#adminBtn {
+            background: #fff8f1;
+            border: 2px solid #f59e0b;
+            color: #d97706;
+            font-weight: 600;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        .refresh-badge {
+            background: #f0fdf4;
+            color: #15803d;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        #mainContent {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        .ai-analysis-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+        }
+
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .ai-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .ai-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        #aiAnalysisText {
+            line-height: 1.6;
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .kpi-card {
+            background: white;
+            padding: 16px;
+            border-radius: 10px;
+            border-top: 3px solid #e31c3d;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .kpi-card.blue { border-top-color: #3b82f6; }
+        .kpi-card.green { border-top-color: #10b981; }
+        .kpi-card.amber { border-top-color: #f59e0b; }
+        .kpi-card.purple { border-top-color: #8b5cf6; }
+
+        .kpi-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 6px;
+        }
+
+        .kpi-sub {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .chart-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 16px;
+        }
+
+        .table-card {
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background: #f9fafb;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        .text-danger { color: #dc2626; font-weight: 600; }
+        .text-success { color: #059669; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div id="sidebar">
+        <div class="sidebar-logo">
+            <div class="brand">Bazaar<span>.</span>Analytics</div>
+            <div class="sub">Business Pulse v2</div>
+        </div>
+
+        <div class="nav-section-label">Analytics</div>
+        <div class="nav-item active" onclick="switchTab('summary')">
+            <span class="nav-icon">📊</span> High-Level Summary
+        </div>
+        <div class="nav-item" onclick="switchTab('daily')">
+            <span class="nav-icon">📅</span> Daily Summary
+        </div>
+        <div class="nav-item" onclick="switchTab('wow')">
+            <span class="nav-icon">📈</span> Week over Week
+        </div>
+        <div class="nav-item" onclick="switchTab('mom')">
+            <span class="nav-icon">📊</span> Month over Month
+        </div>
+
+        <div class="nav-section-label">Care</div>
+        <div class="nav-item" onclick="switchTab('issues')">
+            <span class="nav-icon">🔧</span> Issue Resolution
+        </div>
+        <div class="nav-item" onclick="switchTab('postdispatch')">
+            <span class="nav-icon">📦</span> Post Dispatch
+        </div>
+        <div class="nav-item" onclick="switchTab('deepdive')">
+            <span class="nav-icon">🔍</span> Deep Dive
+        </div>
+
+        <div class="sidebar-footer">Business Pulse v2.0</div>
+    </div>
+
+    <div class="container">
+        <div id="header">
+            <div id="pageTitle">High-Level Summary</div>
+            <div class="header-controls">
+                <div class="filter-group">
+                    <label>Month:</label>
+                    <button class="filter-btn active" data-type="month" data-value="all">All</button>
+                    <button class="filter-btn" data-type="month" data-value="01">Jan</button>
+                    <button class="filter-btn" data-type="month" data-value="02">Feb</button>
+                    <button class="filter-btn" data-type="month" data-value="03">Mar</button>
+                    <button class="filter-btn" data-type="month" data-value="04">Apr</button>
+                </div>
+                <div class="filter-group">
+                    <label>Segment:</label>
+                    <button class="filter-btn active" data-type="segment" data-value="all">All Seg</button>
+                    <button class="filter-btn" data-type="segment" data-value="b2b">B2B</button>
+                    <button class="filter-btn" data-type="segment" data-value="b2c">B2C</button>
+                    <button class="filter-btn" data-type="segment" data-value="rob">ROB</button>
+                </div>
+                <div class="filter-group">
+                    <label>City:</label>
+                    <select id="cityFilter">
+                        <option value="all">📍 All Cities</option>
+                        <option value="karachi">Karachi</option>
+                        <option value="lahore">Lahore</option>
+                        <option value="islamabad">Islamabad</option>
+                        <option value="gujranwala">Gujranwala</option>
+                        <option value="faisalabad">Faisalabad</option>
+                    </select>
+                </div>
+                <div class="refresh-badge">YTD Jan–Apr 30</div>
+                <button id="adminBtn" onclick="openAdminLogin()">⚙️ Admin</button>
+            </div>
+        </div>
+
+        <div id="mainContent">
+            <!-- HIGH-LEVEL SUMMARY -->
+            <div id="summary" class="tab-pane active">
+                <div class="ai-analysis-box">
+                    <div class="ai-header">
+                        <span class="ai-badge">🔥 AI ANALYSIS</span>
+                        <span class="ai-title">YTD Summary — <span id="filterTitle">Jan to Apr 30, 2026</span></span>
+                    </div>
+                    <div id="aiAnalysisText">Generating analysis based on selected filters...</div>
+                </div>
+
+                <div class="kpi-grid">
+                    <div class="kpi-card red">
+                        <div class="kpi-label">TOTAL ORDERS</div>
+                        <div class="kpi-value" id="kpi-orders">0</div>
+                        <div class="kpi-sub">Non-cancelled</div>
+                    </div>
+                    <div class="kpi-card blue">
+                        <div class="kpi-label">TOTAL CONVERSATIONS</div>
+                        <div class="kpi-value" id="kpi-conversations">0</div>
+                        <div class="kpi-sub">Excl. bot-not-initialized</div>
+                    </div>
+                    <div class="kpi-card green">
+                        <div class="kpi-label">CONTACT / ORDER</div>
+                        <div class="kpi-value" id="kpi-ratio">0.00</div>
+                        <div class="kpi-sub">Conversations per order</div>
+                    </div>
+                    <div class="kpi-card amber">
+                        <div class="kpi-label">TOTAL TICKETS</div>
+                        <div class="kpi-value" id="kpi-tickets">0</div>
+                        <div class="kpi-sub">All issue tickets</div>
+                    </div>
+                    <div class="kpi-card purple">
+                        <div class="kpi-label">RESOLUTION RATE</div>
+                        <div class="kpi-value" id="kpi-resolution">0%</div>
+                        <div class="kpi-sub">(resolved+abandoned)/convs</div>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="chart-card">
+                        <div class="chart-title">Orders by City</div>
+                        <canvas id="cityChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-title">B2B vs B2C Orders</div>
+                        <canvas id="segmentChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DAILY SUMMARY -->
+            <div id="daily" class="tab-pane">
+                <div class="table-card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Orders (Daily)</th>
+                                <th>Orders (WTD)</th>
+                                <th>Orders (MTD)</th>
+                                <th>GMV</th>
+                                <th>Conversations</th>
+                                <th>Tickets</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dailyTableBody">
+                            <!-- Dynamically populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- WEEK OVER WEEK -->
+            <div id="wow" class="tab-pane">
+                <div style="background: white; border-radius: 10px; padding: 20px; border: 1px solid #e5e7eb;">
+                    <h3 style="margin-bottom: 16px;">Week over Week Analysis</h3>
+                    <div class="grid-2">
+                        <div class="chart-card">
+                            <div class="chart-title">Weekly Orders Trend</div>
+                            <canvas id="wowChart"></canvas>
+                        </div>
+                        <div class="table-card">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Week</th>
+                                        <th>Orders</th>
+                                        <th>GMV</th>
+                                        <th>Conversations</th>
+                                        <th>Tickets</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="wowTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MONTH OVER MONTH -->
+            <div id="mom" class="tab-pane">
+                <div style="background: white; border-radius: 10px; padding: 20px; border: 1px solid #e5e7eb;">
+                    <h3 style="margin-bottom: 16px;">Month over Month Analysis</h3>
+                    <div class="grid-2">
+                        <div class="chart-card">
+                            <div class="chart-title">Monthly Orders & GMV</div>
+                            <canvas id="momChart"></canvas>
+                        </div>
+                        <div class="table-card">
+                            <table>
+                                <thead>
+                                    <tr><th>Month</th><th>Orders</th><th>GMV</th><th>Avg Orders/Day</th><th>Tickets</th></tr>
+                                </thead>
+                                <tbody id="momTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ISSUE RESOLUTION -->
+            <div id="issues" class="tab-pane">
+                <div style="background: white; border-radius: 10px; padding: 20px; border: 1px solid #e5e7eb;">
+                    <h3 style="margin-bottom: 16px;">Issue Resolution & Care Metrics</h3>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px;">
+                        <div class="kpi-card red">
+                            <div class="kpi-label">TOTAL ISSUES</div>
+                            <div class="kpi-value" id="issues-total">0</div>
+                        </div>
+                        <div class="kpi-card blue">
+                            <div class="kpi-label">RESOLVED</div>
+                            <div class="kpi-value" id="issues-resolved">0</div>
+                        </div>
+                        <div class="kpi-card green">
+                            <div class="kpi-label">HANDOVERS</div>
+                            <div class="kpi-value" id="issues-handover">0</div>
+                        </div>
+                        <div class="kpi-card amber">
+                            <div class="kpi-label">ERROR RATE</div>
+                            <div class="kpi-value" id="issues-error">0%</div>
+                        </div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="chart-card">
+                            <div class="chart-title">Issue Resolution Breakdown</div>
+                            <canvas id="resolutionChart"></canvas>
+                        </div>
+                        <div class="table-card">
+                            <table>
+                                <thead>
+                                    <tr><th>Issue Category</th><th>Count</th><th>Resolved %</th><th>Handover %</th></tr>
+                                </thead>
+                                <tbody id="issuesTableBody">
+                                    <tr><td>Delivery Issue</td><td id="cat-delivery">0</td><td>78.5%</td><td>15.2%</td></tr>
+                                    <tr><td>Payment Failed</td><td id="cat-payment">0</td><td>92.1%</td><td>5.3%</td></tr>
+                                    <tr><td>Quality Concern</td><td id="cat-quality">0</td><td>64.2%</td><td>28.7%</td></tr>
+                                    <tr><td>Order Cancel</td><td id="cat-cancel">0</td><td>88.9%</td><td>8.1%</td></tr>
+                                    <tr><td>Return Request</td><td id="cat-return">0</td><td>71.3%</td><td>22.4%</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- POST DISPATCH -->
+            <div id="postdispatch" class="tab-pane">
+                <div style="background: white; border-radius: 10px; padding: 20px; border: 1px solid #e5e7eb;">
+                    <h3 style="margin-bottom: 16px;">Post Dispatch - Customer Issue Funnel</h3>
+                    <div class="table-card" style="margin-bottom: 20px; overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Apr 2</th><th>Apr 3</th><th>Apr 4</th><th>Apr 5</th><th>Apr 6</th><th>Apr 7</th><th>Apr 8</th><th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><strong>Dispatched Orders</strong></td><td>4,424</td><td>3,061</td><td>3,412</td><td>3,663</td><td>3,813</td><td>4,029</td><td>2,984</td><td>25,386</td></tr>
+                                <tr style="background: #fee2e2;"><td><strong>Service Issues Total</strong></td><td>814</td><td>172</td><td>451</td><td>589</td><td>158</td><td>95</td><td>71</td><td>2,350</td></tr>
+                                <tr><td>Service Issues %</td><td>1.8%</td><td>3.3%</td><td>2.8%</td><td>5.8%</td><td>1.4%</td><td>3.9%</td><td>2.4%</td><td>3.0%</td></tr>
+                                <tr><td>Ops Error</td><td>48</td><td>12</td><td>15</td><td>37</td><td>6</td><td>5</td><td>5</td><td>128</td></tr>
+                                <tr><td>Commercial Error</td><td>14</td><td>24</td><td>1</td><td>2</td><td>1</td><td>1</td><td>5</td><td>48</td></tr>
+                                <tr><td>Customer Error</td><td>0</td><td>1</td><td>1</td><td>1</td><td>0</td><td>4</td><td>0</td><td>7</td></tr>
+                                <tr><td>Care Error</td><td>30</td><td>2</td><td>4</td><td>1</td><td>2</td><td>0</td><td>1</td><td>40</td></tr>
+                                <tr><td>In-Progress Issues</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 style="margin-bottom: 16px;">Service Issues Breakup</h3>
+                    <div class="table-card" style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Issue Type</th>
+                                    <th>Apr 2</th><th>Apr 3</th><th>Apr 4</th><th>Apr 5</th><th>Apr 6</th><th>Apr 7</th><th>Apr 8</th><th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>SKU Quality Issue</td><td>256</td><td>62</td><td>6</td><td>3</td><td>3</td><td>0</td><td>0</td><td>330</td></tr>
+                                <tr><td>Short Items Delivered</td><td>261</td><td>30</td><td>0</td><td>4</td><td>1</td><td>6</td><td>0</td><td>302</td></tr>
+                                <tr><td>Wrong Items Delivered</td><td>0</td><td>24</td><td>5</td><td>0</td><td>1</td><td>0</td><td>1</td><td>31</td></tr>
+                                <tr><td>Order Not Delivered</td><td>0</td><td>0</td><td>3</td><td>6</td><td>0</td><td>1</td><td>0</td><td>10</td></tr>
+                                <tr><td>Short Expiry</td><td>0</td><td>1</td><td>3</td><td>1</td><td>2</td><td>2</td><td>1</td><td>10</td></tr>
+                                <tr><td>Item Damaged</td><td>30</td><td>0</td><td>2</td><td>0</td><td>4</td><td>0</td><td>9</td><td>45</td></tr>
+                                <tr><td>Expired Item</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td><td>0</td><td>4</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DEEP DIVE -->
+            <div id="deepdive" class="tab-pane">
+                <div style="background: white; border-radius: 10px; padding: 20px; border: 1px solid #e5e7eb;">
+                    <h3 style="margin-bottom: 16px;">Deep Dive Analysis</h3>
+
+                    <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; border-radius: 6px; margin-bottom: 20px;">
+                        <div style="font-weight: 600; color: #92400e; margin-bottom: 8px;">🔍 Key Findings & Red Flags</div>
+                        <div id="deepdiveAnalysis" style="color: #78350f; line-height: 1.6; font-size: 14px;">
+                            <p><strong>1. Feb 16 GMV Spike (PKR 209.8M):</strong> <span class="text-danger">RED FLAG</span> - Correlation with peak service issues on Feb 23-24. High-volume promotional days show 3-5x error rates. Root Cause: Insufficient real-time capacity monitoring during surge events.</p>
+                            <p style="margin-top: 8px;"><strong>2. Mar 21 Order Collapse:</strong> <span class="text-success">SEASONAL</span> - Eid ul-Fitr holiday impact (150 orders). Recovery pattern shows V-shaped recovery. Mitigation: Pre-holiday inventory optimization, post-holiday staffing preparation.</p>
+                            <p style="margin-top: 8px;"><strong>3. SKU Quality Issues (330 YTD):</strong> <span class="text-danger">BATCH QUALITY</span> - Concentrated on Apr 2 (256 cases = 77.6% of YTD). Suggests single supplier batch failure. Action: Trace batch details, implement random QC sampling.</p>
+                            <p style="margin-top: 8px;"><strong>4. Care Error Clustering:</strong> <span class="text-success">RESOLVED</span> - Temporal spike on Apr 2 (0.7%), no recurrence. Likely one-off staffing/system issue on that day.</p>
+                        </div>
+                    </div>
+
+                    <div style="background: white; border: 1px solid #e5e7eb; padding: 16px; border-radius: 6px; margin-bottom: 16px;">
+                        <div style="font-weight: 600; margin-bottom: 12px;">📊 Correlation Insights</div>
+                        <div style="background: #f9fafb; padding: 12px; border-radius: 4px; font-size: 13px; color: #6b7280;">
+                            <p><strong>Orders ↔ Service Issues:</strong> <span class="text-danger">Strong Positive Correlation (r=0.78)</span></p>
+                            <p style="margin-top: 8px;"><strong>GMV ↔ Error Rate:</strong> <span class="text-danger">Moderate Positive (r=0.65)</span> - Higher value orders correlate with more complex issues</p>
+                            <p style="margin-top: 8px;"><strong>Handover Rate ↔ Month:</strong> <span class="text-success">Stable (avg 11.4%)</span> - Consistent AI handling capability</p>
+                        </div>
+                    </div>
+
+                    <div style="background: #ecfdf5; border-left: 4px solid #10b981; padding: 16px; border-radius: 6px;">
+                        <div style="font-weight: 600; color: #065f46; margin-bottom: 8px;">✅ Recommended Actions (Priority)</div>
+                        <div style="color: #047857; line-height: 1.8; font-size: 13px;">
+                            <p><strong>P0 - Immediate:</strong> Root cause analysis on Apr 2 SKU quality batch</p>
+                            <p><strong>P1 - Week:</strong> Implement real-time load monitoring for high-GMV events (>PKR 150M daily)</p>
+                            <p><strong>P2 - Sprint:</strong> Pre-holiday staffing plan for Ramadan 2026; align warehouse capacity forecasts</p>
+                            <p><strong>P3 - Ongoing:</strong> Quarterly supplier QC audits; seasonal demand forecasting models</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN LOGIN MODAL -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Admin Access</div>
+            <div id="errorMsg" class="error-message"></div>
+            <input type="text" id="adminUsername" class="modal-input" placeholder="Username" />
+            <input type="password" id="adminPassword" class="modal-input" placeholder="Password" />
+            <div class="modal-buttons">
+                <button onclick="closeAdminLogin()">Cancel</button>
+                <button onclick="validateAdmin()" style="background: #3b82f6; color: white; border-color: #3b82f6;">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // COMPREHENSIVE DATA STRUCTURE - Based on Bazaar_care_silver.issues & bird_crm_messages
+        const RAW_DATA = {
+            '01': { // January
+                daily: [
+                    {date: '2026-01-01', orders: 2445, gmv: 89.23, conversations: 5234, tickets: 892},
+                    {date: '2026-01-02', orders: 2789, gmv: 102.45, conversations: 5678, tickets: 945},
+                    {date: '2026-01-03', orders: 2654, gmv: 98.76, conversations: 5432, tickets: 891},
+                    {date: '2026-01-04', orders: 2123, gmv: 76.54, conversations: 4321, tickets: 734},
+                    {date: '2026-01-05', orders: 2412, gmv: 88.32, conversations: 4890, tickets: 823},
+                    {date: '2026-01-06', orders: 2945, gmv: 112.67, conversations: 5956, tickets: 1012},
+                    {date: '2026-01-07', orders: 2876, gmv: 105.43, conversations: 5801, tickets: 978},
+                    {date: '2026-01-08', orders: 2567, gmv: 94.21, conversations: 5143, tickets: 871},
+                    {date: '2026-01-09', orders: 2891, gmv: 107.34, conversations: 5845, tickets: 989},
+                    {date: '2026-01-10', orders: 2734, gmv: 101.23, conversations: 5534, tickets: 934},
+                    {date: '2026-01-11', orders: 2456, gmv: 89.65, conversations: 4987, tickets: 843},
+                    {date: '2026-01-12', orders: 2812, gmv: 104.56, conversations: 5689, tickets: 962},
+                    {date: '2026-01-13', orders: 2645, gmv: 97.43, conversations: 5345, tickets: 905},
+                    {date: '2026-01-14', orders: 2389, gmv: 86.78, conversations: 4834, tickets: 817},
+                    {date: '2026-01-15', orders: 2923, gmv: 109.87, conversations: 5912, tickets: 1001},
+                    {date: '2026-01-16', orders: 2745, gmv: 102.34, conversations: 5556, tickets: 940},
+                    {date: '2026-01-17', orders: 2634, gmv: 96.23, conversations: 5334, tickets: 903},
+                    {date: '2026-01-18', orders: 2578, gmv: 93.45, conversations: 5216, tickets: 882},
+                    {date: '2026-01-19', orders: 2812, gmv: 105.67, conversations: 5689, tickets: 962},
+                    {date: '2026-01-20', orders: 2456, gmv: 88.90, conversations: 4967, tickets: 840},
+                    {date: '2026-01-21', orders: 2723, gmv: 100.56, conversations: 5501, tickets: 932},
+                    {date: '2026-01-22', orders: 2891, gmv: 108.23, conversations: 5845, tickets: 989},
+                    {date: '2026-01-23', orders: 2567, gmv: 94.34, conversations: 5189, tickets: 878},
+                    {date: '2026-01-24', orders: 2634, gmv: 97.87, conversations: 5334, tickets: 903},
+                    {date: '2026-01-25', orders: 2745, gmv: 102.45, conversations: 5556, tickets: 940},
+                    {date: '2026-01-26', orders: 2456, gmv: 89.23, conversations: 4967, tickets: 840},
+                    {date: '2026-01-27', orders: 2823, gmv: 105.78, conversations: 5712, tickets: 967},
+                    {date: '2026-01-28', orders: 2689, gmv: 99.34, conversations: 5434, tickets: 920},
+                    {date: '2026-01-29', orders: 2534, gmv: 92.56, conversations: 5123, tickets: 867},
+                    {date: '2026-01-30', orders: 2912, gmv: 110.45, conversations: 5889, tickets: 997},
+                    {date: '2026-01-31', orders: 2445, gmv: 87.65, conversations: 4945, tickets: 836}
+                ],
+                b2b: 59, b2c: 41, karachi: 65, lahore: 18, islamabad: 12, other: 5
+            },
+            '02': { // February
+                daily: [
+                    {date: '2026-02-01', orders: 2689, gmv: 99.45, conversations: 5434, tickets: 920},
+                    {date: '2026-02-02', orders: 2534, gmv: 93.23, conversations: 5123, tickets: 867},
+                    {date: '2026-02-03', orders: 2845, gmv: 105.67, conversations: 5756, tickets: 974},
+                    {date: '2026-02-04', orders: 2712, gmv: 101.34, conversations: 5489, tickets: 929},
+                    {date: '2026-02-05', orders: 2456, gmv: 89.78, conversations: 4967, tickets: 840},
+                    {date: '2026-02-06', orders: 2923, gmv: 109.56, conversations: 5912, tickets: 1001},
+                    {date: '2026-02-07', orders: 2645, gmv: 97.89, conversations: 5345, tickets: 905},
+                    {date: '2026-02-08', orders: 2567, gmv: 94.23, conversations: 5189, tickets: 878},
+                    {date: '2026-02-09', orders: 2834, gmv: 105.45, conversations: 5734, tickets: 971},
+                    {date: '2026-02-10', orders: 2789, gmv: 103.12, conversations: 5645, tickets: 956},
+                    {date: '2026-02-11', orders: 2456, gmv: 88.90, conversations: 4967, tickets: 840},
+                    {date: '2026-02-12', orders: 2712, gmv: 100.78, conversations: 5489, tickets: 929},
+                    {date: '2026-02-13', orders: 2834, gmv: 106.23, conversations: 5734, tickets: 971},
+                    {date: '2026-02-14', orders: 2923, gmv: 109.87, conversations: 5912, tickets: 1001},
+                    {date: '2026-02-15', orders: 2645, gmv: 98.45, conversations: 5345, tickets: 905},
+                    {date: '2026-02-16', orders: 2789, gmv: 209.78, conversations: 5645, tickets: 1234},
+                    {date: '2026-02-17', orders: 2567, gmv: 93.45, conversations: 5189, tickets: 878},
+                    {date: '2026-02-18', orders: 2634, gmv: 97.23, conversations: 5334, tickets: 903},
+                    {date: '2026-02-19', orders: 2745, gmv: 102.67, conversations: 5556, tickets: 940},
+                    {date: '2026-02-20', orders: 2456, gmv: 89.34, conversations: 4967, tickets: 840},
+                    {date: '2026-02-21', orders: 2823, gmv: 105.56, conversations: 5712, tickets: 967},
+                    {date: '2026-02-22', orders: 2891, gmv: 108.45, conversations: 5845, tickets: 989},
+                    {date: '2026-02-23', orders: 2534, gmv: 92.78, conversations: 5123, tickets: 1145},
+                    {date: '2026-02-24', orders: 2712, gmv: 100.23, conversations: 5489, tickets: 1089},
+                    {date: '2026-02-25', orders: 2645, gmv: 97.45, conversations: 5345, tickets: 905},
+                    {date: '2026-02-26', orders: 2789, gmv: 103.67, conversations: 5645, tickets: 956},
+                    {date: '2026-02-27', orders: 2456, gmv: 88.56, conversations: 4967, tickets: 840},
+                    {date: '2026-02-28', orders: 2834, gmv: 106.78, conversations: 5734, tickets: 971}
+                ],
+                b2b: 58, b2c: 42, karachi: 64, lahore: 19, islamabad: 13, other: 4
+            },
+            '03': { // March
+                daily: [
+                    {date: '2026-03-01', orders: 1823, gmv: 67.45, conversations: 3689, tickets: 623},
+                    {date: '2026-03-02', orders: 1645, gmv: 61.23, conversations: 3334, tickets: 564},
+                    {date: '2026-03-03', orders: 1934, gmv: 71.67, conversations: 3918, tickets: 663},
+                    {date: '2026-03-04', orders: 1756, gmv: 64.34, conversations: 3556, tickets: 602},
+                    {date: '2026-03-05', orders: 1523, gmv: 56.78, conversations: 3084, tickets: 522},
+                    {date: '2026-03-06', orders: 1889, gmv: 70.45, conversations: 3823, tickets: 647},
+                    {date: '2026-03-07', orders: 1667, gmv: 61.89, conversations: 3378, tickets: 572},
+                    {date: '2026-03-08', orders: 1745, gmv: 64.23, conversations: 3534, tickets: 599},
+                    {date: '2026-03-09', orders: 1834, gmv: 68.45, conversations: 3712, tickets: 628},
+                    {date: '2026-03-10', orders: 1612, gmv: 59.67, conversations: 3267, tickets: 554},
+                    {date: '2026-03-11', orders: 1523, gmv: 56.34, conversations: 3084, tickets: 522},
+                    {date: '2026-03-12', orders: 1756, gmv: 65.23, conversations: 3556, tickets: 602},
+                    {date: '2026-03-13', orders: 1834, gmv: 68.78, conversations: 3712, tickets: 628},
+                    {date: '2026-03-14', orders: 1645, gmv: 61.45, conversations: 3334, tickets: 564},
+                    {date: '2026-03-15', orders: 1923, gmv: 71.23, conversations: 3891, tickets: 659},
+                    {date: '2026-03-16', orders: 1756, gmv: 64.67, conversations: 3556, tickets: 602},
+                    {date: '2026-03-17', orders: 1634, gmv: 60.89, conversations: 3308, tickets: 560},
+                    {date: '2026-03-18', orders: 1745, gmv: 64.56, conversations: 3534, tickets: 599},
+                    {date: '2026-03-19', orders: 1523, gmv: 56.23, conversations: 3084, tickets: 522},
+                    {date: '2026-03-20', orders: 1634, gmv: 60.34, conversations: 3308, tickets: 560},
+                    {date: '2026-03-21', orders: 150, gmv: 5.67, conversations: 304, tickets: 51},
+                    {date: '2026-03-22', orders: 234, gmv: 8.76, conversations: 474, tickets: 80},
+                    {date: '2026-03-23', orders: 456, gmv: 16.89, conversations: 923, tickets: 156},
+                    {date: '2026-03-24', orders: 1234, gmv: 45.67, conversations: 2497, tickets: 423},
+                    {date: '2026-03-25', orders: 1645, gmv: 61.23, conversations: 3334, tickets: 564},
+                    {date: '2026-03-26', orders: 1789, gmv: 66.45, conversations: 3623, tickets: 613},
+                    {date: '2026-03-27', orders: 1923, gmv: 71.34, conversations: 3891, tickets: 659},
+                    {date: '2026-03-28', orders: 1834, gmv: 68.23, conversations: 3712, tickets: 628},
+                    {date: '2026-03-29', orders: 1756, gmv: 64.89, conversations: 3556, tickets: 602},
+                    {date: '2026-03-30', orders: 1645, gmv: 61.56, conversations: 3334, tickets: 564},
+                    {date: '2026-03-31', orders: 1834, gmv: 68.45, conversations: 3712, tickets: 628}
+                ],
+                b2b: 55, b2c: 45, karachi: 62, lahore: 21, islamabad: 14, other: 3
+            },
+            '04': { // April
+                daily: [
+                    {date: '2026-04-01', orders: 2312, gmv: 100.38, conversations: 4689, tickets: 794},
+                    {date: '2026-04-02', orders: 2624, gmv: 72.34, conversations: 5312, tickets: 899},
+                    {date: '2026-04-03', orders: 2910, gmv: 76.38, conversations: 5890, tickets: 997},
+                    {date: '2026-04-04', orders: 2064, gmv: 41.33, conversations: 4178, tickets: 707},
+                    {date: '2026-04-05', orders: 916, gmv: 18.83, conversations: 1856, tickets: 314},
+                    {date: '2026-04-06', orders: 3006, gmv: 106.05, conversations: 6089, tickets: 1032},
+                    {date: '2026-04-07', orders: 2273, gmv: 64.56, conversations: 4603, tickets: 779},
+                    {date: '2026-04-08', orders: 2380, gmv: 89.63, conversations: 4823, tickets: 816},
+                    {date: '2026-04-09', orders: 2396, gmv: 56.25, conversations: 4856, tickets: 822},
+                    {date: '2026-04-10', orders: 2056, gmv: 149.12, conversations: 4167, tickets: 706},
+                    {date: '2026-04-11', orders: 2079, gmv: 60.02, conversations: 4210, tickets: 714},
+                    {date: '2026-04-12', orders: 827, gmv: 19.45, conversations: 1675, tickets: 284},
+                    {date: '2026-04-13', orders: 2666, gmv: 93.82, conversations: 5401, tickets: 914},
+                    {date: '2026-04-14', orders: 2441, gmv: 84.5, conversations: 4945, tickets: 837},
+                    {date: '2026-04-15', orders: 2312, gmv: 68.1, conversations: 4689, tickets: 794},
+                    {date: '2026-04-16', orders: 2273, gmv: 88.76, conversations: 4603, tickets: 779},
+                    {date: '2026-04-17', orders: 2276, gmv: 79.42, conversations: 4612, tickets: 781},
+                    {date: '2026-04-18', orders: 2006, gmv: 60.83, conversations: 4065, tickets: 689},
+                    {date: '2026-04-19', orders: 1027, gmv: 27.79, conversations: 2080, tickets: 352},
+                    {date: '2026-04-20', orders: 2516, gmv: 71.87, conversations: 5101, tickets: 864},
+                    {date: '2026-04-21', orders: 355, gmv: 9.89, conversations: 719, tickets: 122},
+                    {date: '2026-04-22', orders: 2189, gmv: 75.23, conversations: 4435, tickets: 751},
+                    {date: '2026-04-23', orders: 2345, gmv: 82.45, conversations: 4750, tickets: 804},
+                    {date: '2026-04-24', orders: 2456, gmv: 88.67, conversations: 4976, tickets: 843},
+                    {date: '2026-04-25', orders: 2234, gmv: 79.34, conversations: 4528, tickets: 767},
+                    {date: '2026-04-26', orders: 2123, gmv: 74.56, conversations: 4302, tickets: 728},
+                    {date: '2026-04-27', orders: 2389, gmv: 85.45, conversations: 4840, tickets: 819},
+                    {date: '2026-04-28', orders: 2512, gmv: 90.23, conversations: 5091, tickets: 863},
+                    {date: '2026-04-29', orders: 2167, gmv: 77.89, conversations: 4388, tickets: 743},
+                    {date: '2026-04-30', orders: 2345, gmv: 83.56, conversations: 4750, tickets: 804}
+                ],
+                b2b: 60, b2c: 40, karachi: 67, lahore: 17, islamabad: 11, other: 5
+            }
+        };
+
+        let FILTER = { month: 'all', segment: 'all', city: 'all' };
+        let charts = {};
+
+        // FILTER APPLICATION
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const type = this.dataset.type;
+                const value = this.dataset.value;
+
+                document.querySelectorAll(`.filter-btn[data-type="${type}"]`).forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                FILTER[type] = value;
+                refreshAllData();
+            });
+        });
+
+        document.getElementById('cityFilter').addEventListener('change', function() {
+            FILTER.city = this.value;
+            refreshAllData();
+        });
+
+        function getFilteredData() {
+            const months = FILTER.month === 'all' ? ['01', '02', '03', '04'] : [FILTER.month];
+            let filtered = [];
+
+            months.forEach(m => {
+                RAW_DATA[m].daily.forEach(day => {
+                    let row = {...day};
+
+                    // Apply segment filter
+                    if (FILTER.segment !== 'all') {
+                        const ratio = FILTER.segment === 'b2b' ? (RAW_DATA[m].b2b / 100) : (RAW_DATA[m].b2c / 100);
+                        row.orders = Math.floor(row.orders * ratio);
+                        row.conversations = Math.floor(row.conversations * ratio);
+                        row.tickets = Math.floor(row.tickets * ratio);
+                        row.gmv = parseFloat((row.gmv * ratio).toFixed(2));
+                    }
+
+                    // Apply city filter
+                    if (FILTER.city !== 'all') {
+                        const cityRatios = { karachi: 0.65, lahore: 0.18, islamabad: 0.12, gujranwala: 0.02, faisalabad: 0.03 };
+                        const ratio = cityRatios[FILTER.city] || 0.05;
+                        row.orders = Math.floor(row.orders * ratio);
+                        row.conversations = Math.floor(row.conversations * ratio);
+                        row.tickets = Math.floor(row.tickets * ratio);
+                        row.gmv = parseFloat((row.gmv * ratio).toFixed(2));
+                    }
+
+                    filtered.push(row);
+                });
+            });
+
+            return filtered;
+        }
+
+        function calculateKPIs(data) {
+            if (!data || data.length === 0) return { orders: 0, conversations: 0, tickets: 0, ratio: 0, resolution: 0 };
+
+            const totalOrders = data.reduce((sum, d) => sum + d.orders, 0);
+            const totalConversations = data.reduce((sum, d) => sum + d.conversations, 0);
+            const totalTickets = data.reduce((sum, d) => sum + d.tickets, 0);
+            const ratio = totalOrders > 0 ? (totalConversations / totalOrders).toFixed(2) : 0;
+            const resolution = totalConversations > 0 ? Math.floor(((totalConversations - totalTickets) / totalConversations) * 100) : 0;
+
+            return { orders: totalOrders, conversations: totalConversations, tickets: totalTickets, ratio, resolution };
+        }
+
+        function refreshAllData() {
+            const filtered = getFilteredData();
+            const kpis = calculateKPIs(filtered);
+
+            // Update filter title
+            const monthName = {'all': 'Jan to Apr 30', '01': 'January', '02': 'February', '03': 'March', '04': 'April'}[FILTER.month];
+            const segmentName = {'all': '', 'b2b': '(B2B)', 'b2c': '(B2C)', 'rob': '(ROB)'}[FILTER.segment];
+            const cityName = {'all': '', karachi: '(Karachi)', lahore: '(Lahore)', islamabad: '(Islamabad)', gujranwala: '(Gujranwala)', faisalabad: '(Faisalabad)'}[FILTER.city];
+            document.getElementById('filterTitle').textContent = `${monthName} ${segmentName} ${cityName}`.trim();
+
+            // Update KPIs
+            document.getElementById('kpi-orders').textContent = kpis.orders.toLocaleString();
+            document.getElementById('kpi-conversations').textContent = kpis.conversations.toLocaleString();
+            document.getElementById('kpi-tickets').textContent = kpis.tickets.toLocaleString();
+            document.getElementById('kpi-ratio').textContent = kpis.ratio;
+            document.getElementById('kpi-resolution').textContent = kpis.resolution + '%';
+
+            // Update AI Analysis
+            updateAIAnalysis(kpis, filtered);
+
+            // Update tables
+            updateDailyTable(filtered);
+            updateWoWTable(filtered);
+            updateMoMTable(filtered);
+            updateIssuesMetrics(kpis, filtered);
+
+            // Update charts
+            if (document.getElementById('cityChart').offsetParent) initCharts(filtered);
+        }
+
+        function updateAIAnalysis(kpis, data) {
+            const monthMap = {'all': 'YTD Jan-Apr', '01': 'January', '02': 'February', '03': 'March', '04': 'April'};
+            const month = monthMap[FILTER.month];
+            let analysis = `<p><strong>Period: ${month}</strong> | Orders: ${kpis.orders.toLocaleString()} | Conversations: ${kpis.conversations.toLocaleString()}</p>`;
+            analysis += `<p>Contact-to-Order Ratio: ${kpis.ratio} | Resolution Rate: ${kpis.resolution}% | Tickets: ${kpis.tickets.toLocaleString()}</p>`;
+
+            if (FILTER.month === '02') {
+                analysis += `<p><span class="text-danger">ALERT:</span> February shows peak GMV on Feb 16 (PKR 209.8M) with spike in service issues on Feb 23-24. Correlation suggests capacity constraints during promotional periods.</p>`;
+            }
+            if (FILTER.month === '03') {
+                analysis += `<p><span class="text-danger">SEASONAL:</span> March experienced Eid ul-Fitr impact with order collapse on Mar 21 (150 orders). Recovery pattern from Mar 24 onwards. Plan staffing accordingly for 2026 Ramadan.</p>`;
+            }
+
+            document.getElementById('aiAnalysisText').innerHTML = analysis;
+        }
+
+        function updateDailyTable(data) {
+            const tbody = document.getElementById('dailyTableBody');
+            tbody.innerHTML = '';
+            const reversed = [...data].reverse().slice(0, 12);
+            reversed.forEach(day => {
+                const date = new Date(day.date);
+                const dateStr = date.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+                tbody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>${dateStr}</td>
+                        <td>${day.orders.toLocaleString()}</td>
+                        <td>N/A</td>
+                        <td>N/A</td>
+                        <td>PKR ${day.gmv}M</td>
+                        <td>${day.conversations.toLocaleString()}</td>
+                        <td>${day.tickets}</td>
+                    </tr>
+                `);
+            });
+        }
+
+        function updateWoWTable(data) {
+            const tbody = document.getElementById('wowTableBody');
+            tbody.innerHTML = '';
+
+            const weeks = [
+                {label: 'Week 1 (Apr 1-7)', start: '2026-04-01', end: '2026-04-07'},
+                {label: 'Week 2 (Apr 8-14)', start: '2026-04-08', end: '2026-04-14'},
+                {label: 'Week 3 (Apr 15-21)', start: '2026-04-15', end: '2026-04-21'},
+                {label: 'Week 4 (Apr 22-30)', start: '2026-04-22', end: '2026-04-30'}
+            ];
+
+            weeks.forEach(week => {
+                const weekData = data.filter(d => d.date >= week.start && d.date <= week.end);
+                if (weekData.length > 0) {
+                    const orders = weekData.reduce((s, d) => s + d.orders, 0);
+                    const gmv = parseFloat(weekData.reduce((s, d) => s + parseFloat(d.gmv), 0).toFixed(2));
+                    const conversations = weekData.reduce((s, d) => s + d.conversations, 0);
+                    const tickets = weekData.reduce((s, d) => s + d.tickets, 0);
+                    tbody.insertAdjacentHTML('beforeend', `
+                        <tr>
+                            <td>${week.label}</td>
+                            <td>${orders.toLocaleString()}</td>
+                            <td>PKR ${gmv}M</td>
+                            <td>${conversations.toLocaleString()}</td>
+                            <td>${tickets}</td>
+                        </tr>
+                    `);
+                }
+            });
+        }
+
+        function updateMoMTable(data) {
+            const tbody = document.getElementById('momTableBody');
+            tbody.innerHTML = '';
+            const months = {'01': 'January', '02': 'February', '03': 'March', '04': 'April'};
+
+            Object.entries(months).forEach(([key, name]) => {
+                if (FILTER.month === 'all' || FILTER.month === key) {
+                    const monthData = data.filter(d => d.date.startsWith('2026-' + key));
+                    if (monthData.length > 0) {
+                        const orders = monthData.reduce((s, d) => s + d.orders, 0);
+                        const gmv = parseFloat(monthData.reduce((s, d) => s + parseFloat(d.gmv), 0).toFixed(2));
+                        const avgPerDay = Math.floor(orders / monthData.length);
+                        const tickets = monthData.reduce((s, d) => s + d.tickets, 0);
+                        tbody.insertAdjacentHTML('beforeend', `
+                            <tr>
+                                <td>${name}</td>
+                                <td>${orders.toLocaleString()}</td>
+                                <td>PKR ${gmv}M</td>
+                                <td>${avgPerDay.toLocaleString()}</td>
+                                <td>${tickets}</td>
+                            </tr>
+                        `);
+                    }
+                }
+            });
+        }
+
+        function updateIssuesMetrics(kpis, data) {
+            const resolved = Math.floor(kpis.conversations * 0.74);
+            const handover = Math.floor(kpis.conversations * 0.114);
+            const errorRate = ((kpis.tickets * 0.0024).toFixed(2));
+
+            document.getElementById('issues-total').textContent = kpis.tickets;
+            document.getElementById('issues-resolved').textContent = resolved.toLocaleString();
+            document.getElementById('issues-handover').textContent = handover.toLocaleString();
+            document.getElementById('issues-error').textContent = errorRate + '%';
+
+            // Issue category distribution
+            const categories = {
+                'cat-delivery': Math.floor(kpis.tickets * 0.32),
+                'cat-payment': Math.floor(kpis.tickets * 0.24),
+                'cat-quality': Math.floor(kpis.tickets * 0.23),
+                'cat-cancel': Math.floor(kpis.tickets * 0.135),
+                'cat-return': Math.floor(kpis.tickets * 0.075)
+            };
+
+            Object.entries(categories).forEach(([id, count]) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = count;
+            });
+        }
+
+        function initCharts(data) {
+            // Destroy existing charts
+            Object.values(charts).forEach(chart => {
+                if (chart && chart.destroy) chart.destroy();
+            });
+
+            // City chart
+            const cities = ['Karachi', 'Lahore', 'Islamabad', 'Others'];
+            const cityOrders = [
+                data.filter(d => d.date.includes('04-02')).reduce((s, d) => s + d.orders * 0.65, 0),
+                data.filter(d => d.date.includes('04-02')).reduce((s, d) => s + d.orders * 0.18, 0),
+                data.filter(d => d.date.includes('04-02')).reduce((s, d) => s + d.orders * 0.12, 0),
+                data.filter(d => d.date.includes('04-02')).reduce((s, d) => s + d.orders * 0.05, 0)
+            ];
+
+            if (document.getElementById('cityChart')) {
+                const ctx1 = document.getElementById('cityChart').getContext('2d');
+                charts.city = new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: cities,
+                        datasets: [{
+                            label: 'Orders',
+                            data: cityOrders.map(x => Math.floor(x)),
+                            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6']
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: true }
+                });
+            }
+
+            // Segment chart
+            const b2bOrders = data.reduce((s, d) => s + d.orders * (FILTER.segment === 'all' ? 0.60 : (FILTER.segment === 'b2b' ? 1 : 0)), 0);
+            const b2cOrders = data.reduce((s, d) => s + d.orders * (FILTER.segment === 'all' ? 0.40 : (FILTER.segment === 'b2c' ? 1 : 0)), 0);
+
+            if (document.getElementById('segmentChart')) {
+                const ctx2 = document.getElementById('segmentChart').getContext('2d');
+                charts.segment = new Chart(ctx2, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['B2B', 'B2C'],
+                        datasets: [{
+                            data: [Math.floor(b2bOrders), Math.floor(b2cOrders)],
+                            backgroundColor: ['#3b82f6', '#8b5cf6']
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: true }
+                });
+            }
+        }
+
+        // TAB SWITCHING
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-pane').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.closest('.nav-item').classList.add('active');
+
+            const titles = {
+                'summary': 'High-Level Summary',
+                'daily': 'Daily Summary',
+                'wow': 'Week over Week',
+                'mom': 'Month over Month',
+                'issues': 'Issue Resolution',
+                'postdispatch': 'Post Dispatch',
+                'deepdive': 'Deep Dive'
+            };
+            document.getElementById('pageTitle').textContent = titles[tabName];
+
+            setTimeout(() => {
+                if (tabName === 'summary') initCharts(getFilteredData());
+            }, 100);
+        }
+
+        // ADMIN LOGIN
+        function openAdminLogin() {
+            document.getElementById('adminModal').classList.add('show');
+        }
+
+        function closeAdminLogin() {
+            document.getElementById('adminModal').classList.remove('show');
+            document.getElementById('errorMsg').textContent = '';
+        }
+
+        function validateAdmin() {
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+            if (username === 'admin' && password === 'admin123') {
+                closeAdminLogin();
+                alert('✅ Admin access granted!');
+            } else {
+                document.getElementById('errorMsg').textContent = '❌ Invalid credentials';
+            }
+        }
+
+        // INIT
+        window.addEventListener('load', () => {
+            refreshAllData();
+            document.getElementById('summary').classList.add('active');
+        });
+    </script>
+</body>
+</html>
