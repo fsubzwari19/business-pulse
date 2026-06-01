@@ -466,7 +466,7 @@
                         <option value="faisalabad">Faisalabad</option>
                     </select>
                 </div>
-                <div class="refresh-badge">🕐 YTD Jan–May 24</div>
+                <div class="refresh-badge">🕐 YTD Jan–Jun 1</div>
                 <button id="adminBtn" onclick="openAdminLogin()">⚙️ Admin</button>
             </div>
         </div>
@@ -477,7 +477,7 @@
                 <div class="ai-analysis-box">
                     <div class="ai-header">
                         <span class="ai-badge">🔥 AI ANALYSIS</span>
-                        <span class="ai-title">YTD Summary — <span id="filterTitle">Jan to May 24, 2026</span></span>
+                        <span class="ai-title">YTD Summary — <span id="filterTitle">Jan to May 25, 2026</span></span>
                     </div>
                     <div id="aiAnalysisText">Generating analysis based on selected filters...</div>
                 </div>
@@ -992,7 +992,7 @@
                     {date:'2026-04-30',orders:1013,gmv:41.31,b2b:728,b2c:173,conversations:0,tickets:53}
                 ]
             },
-                                                '05': {
+                        '05': {
                 daily: [
                     {date:'2026-05-01',orders:1160,gmv:31.13,b2b:675,b2c:339,conversations:0,tickets:237},
                     {date:'2026-05-02',orders:2878,gmv:53.06,b2b:1442,b2c:295,conversations:5713,tickets:1092},
@@ -1013,11 +1013,23 @@
                     {date:'2026-05-17',orders:596,gmv:15.19,b2b:455,b2c:126,conversations:1888,tickets:827},
                     {date:'2026-05-18',orders:2789,gmv:117.24,b2b:1430,b2c:223,conversations:3905,tickets:1129},
                     {date:'2026-05-19',orders:2362,gmv:81.37,b2b:1126,b2c:210,conversations:599,tickets:1136},
-                    {date:'2026-05-20',orders:2481,gmv:117.31,b2b:1185,b2c:200,conversations:0,tickets:576},
-                    {date:'2026-05-21',orders:2666,gmv:95.23,b2b:1207,b2c:235,conversations:0,tickets:1034},
-                    {date:'2026-05-22',orders:2294,gmv:107.99,b2b:1058,b2c:271,conversations:0,tickets:1509},
-                    {date:'2026-05-23',orders:2587,gmv:70.56,b2b:1338,b2c:266,conversations:0,tickets:1667},
-                    {date:'2026-05-24',orders:308,gmv:10.4,b2b:243,b2c:59,conversations:0,tickets:245}
+                    {date:'2026-05-20',orders:2475,gmv:116.73,b2b:1179,b2c:200,conversations:0,tickets:576},
+                    {date:'2026-05-21',orders:2659,gmv:94.31,b2b:1201,b2c:235,conversations:0,tickets:1034},
+                    {date:'2026-05-22',orders:2294,gmv:107.58,b2b:1058,b2c:271,conversations:0,tickets:1509},
+                    {date:'2026-05-23',orders:2565,gmv:69.35,b2b:1317,b2c:265,conversations:0,tickets:1667},
+                    {date:'2026-05-24',orders:1445,gmv:47.96,b2b:724,b2c:155,conversations:0,tickets:1495},
+                    {date:'2026-05-25',orders:126,gmv:14.58,b2b:13,b2c:2,conversations:0,tickets:113},
+                    {date:'2026-05-26',orders:821,gmv:52.69,b2b:17,b2c:7,conversations:0,tickets:70},
+                    {date:'2026-05-27',orders:5,gmv:0.04,b2b:3,b2c:2,conversations:0,tickets:85},
+                    {date:'2026-05-28',orders:195,gmv:2.71,b2b:161,b2c:34,conversations:0,tickets:92},
+                    {date:'2026-05-29',orders:947,gmv:23.13,b2b:679,b2c:216,conversations:1188,tickets:996},
+                    {date:'2026-05-30',orders:1526,gmv:61.79,b2b:1007,b2c:193,conversations:2373,tickets:1439},
+                    {date:'2026-05-31',orders:1006,gmv:42.27,b2b:583,b2c:221,conversations:0,tickets:1811}
+                ]
+            },
+                        '06': {
+                daily: [
+                    {date:'2026-06-01',orders:299,gmv:12.59,b2b:236,b2c:55,conversations:0,tickets:51}
                 ]
             }
         };
@@ -1030,7 +1042,8 @@
             '02': {res:171973,abn:7992,hov:34364,tot:214640,ai:49971,invalid:2442},
             '03': {res:176608,abn:10358,hov:40774,tot:228202,ai:44535,invalid:1354},
             '04': {res:93388,abn:7029,hov:18790,tot:119528,ai:33893,invalid:512},
-            '05': {res:45609,abn:268,hov:21902,tot:67900,ai:22211,invalid:247},
+            '05': {res:48369,abn:277,hov:22694,tot:71461,ai:23573,invalid:261},
+            '06': {res:0,abn:0,hov:0,tot:0,ai:0,invalid:0},
         };
 
         const ISSUES_DATA = {
@@ -1059,7 +1072,12 @@
                     b2c: {total:4921, resolved:4853, invalid:48,  inprogress:20},
                     rob: {total:29,   resolved:24,   invalid:0,   inprogress:5}
                 },
-                '05': {all: {total:22300,resolved:22033,invalid:247,inprogress:20},
+                '05': {all: {total:28156,resolved:27856,invalid:274,inprogress:26},
+                    b2b: {total:0,resolved:0,invalid:0,inprogress:0},
+                    b2c: {total:0,resolved:0,invalid:0,inprogress:0},
+                    rob: {total:0,resolved:0,invalid:0,inprogress:0}
+                },
+                '06': {all: {total:51,resolved:47,invalid:0,inprogress:4},
                     b2b: {total:0,resolved:0,invalid:0,inprogress:0},
                     b2c: {total:0,resolved:0,invalid:0,inprogress:0},
                     rob: {total:0,resolved:0,invalid:0,inprogress:0}
