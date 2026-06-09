@@ -447,6 +447,7 @@
                     <button class="filter-btn" data-type="month" data-value="03">Mar</button>
                     <button class="filter-btn" data-type="month" data-value="04">Apr</button>
                     <button class="filter-btn" data-type="month" data-value="05">May</button>
+                    <button class="filter-btn" data-type="month" data-value="06">Jun</button>
                 </div>
                 <div class="filter-group">
                     <label>Store Type:</label>
@@ -1535,7 +1536,7 @@
         // DATA FUNCTIONS
         // ════════════════════════════════════════════════════════════
         function getFilteredData() {
-            const months = FILTER.month === 'all' ? ['01','02','03','04','05'] : [FILTER.month];
+            const months = FILTER.month === 'all' ? ['01','02','03','04','05','06'] : [FILTER.month];
             const cityRatios = {karachi:0.65,lahore:0.18,islamabad:0.12,gujranwala:0.02,faisalabad:0.03};
             let filtered = [];
             months.forEach(m => {
@@ -1741,7 +1742,7 @@
         function updateMoMTable(data) {
             const tbody = document.getElementById('momTableBody');
             tbody.innerHTML = '';
-            const months = {'01':'January','02':'February','03':'March','04':'April','05':'May'};
+            const months = {'01':'January','02':'February','03':'March','04':'April','05':'May','06':'June'};
             const mLabels=[], mOrders=[], mB2B=[], mB2C=[], mROB=[], mGMV=[];
             Object.entries(months).forEach(([key,name]) => {
                 if (FILTER.month !== 'all' && FILTER.month !== key) return;
@@ -1795,7 +1796,7 @@
         }
 
         function updateIssuesMetrics(kpis) {
-            const selMonths = FILTER.month === 'all' ? ['01','02','03','04','05'] : [FILTER.month];
+            const selMonths = FILTER.month === 'all' ? ['01','02','03','04','05','06'] : [FILTER.month];
             const seg = (FILTER.segment === 'all') ? 'all' : FILTER.segment;
             let tot=0,res=0,inv=0,ip=0;
             let catMap={}, teamMap={};
